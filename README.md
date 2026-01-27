@@ -8,7 +8,7 @@ Built as a Monorepo with **React**, **Node.js**, **Prisma**, and **PostgreSQL**.
 
 ## 🎥 Demo
 
-https://github.com/user-attachments/assets/458a1b2b-5d1e-445f-a181-dd7d4595d9b2
+https://pub-1c60411c3ebe4f59aeddffbc6bfb1cdf.r2.dev/projects/WhatsApp%20Video%202026-01-24%20at%201.10.56%20AM%20(1)_1.mp4
 
 ## 🚀 Quick Start (Docker)
 
@@ -17,7 +17,7 @@ The easiest way to run Retain is using Docker. You don't need to install Node or
 ### 1. Clone the Repository
 
 ```bash
-git clone [https://github.com/sudarshan161219/retain.git](https://github.com/sudarshan161219/retain.git)
+git clone https://github.com/sudarshan161219/retain.git
 cd retain-monorepo
 
 ```
