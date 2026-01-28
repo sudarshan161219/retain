@@ -1,23 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api, { setAuthToken, clearAuthToken } from "@/lib/api/api";
+import api from "@/lib/api/api";
 import { toast } from "sonner";
+import type { Client } from "@/types/client/client";
 
 export type ClientStatus = "ACTIVE" | "PAUSED" | "ARCHIVED";
 
-export const useRetainerAdmin = (adminToken: string | undefined) => {
+export const useRetainerAdmin = (clientId: string | undefined) => {
   const queryClient = useQueryClient();
-  const queryKey = ["admin-client", adminToken];
+  // Unique cache key for this specific client
+  const queryKey = ["client", clientId];
 
-  // 1. FETCH ADMIN DATA
+  // 1. FETCH CLIENT DATA
   const query = useQuery({
     queryKey,
     queryFn: async () => {
-      if (adminToken) setAuthToken(adminToken);
-      const { data } = await api.get("/clients/admin");
-      return data.data;
+      const { data } = await api.get(`/clients/${clientId}`);
+      return data as Client;
     },
-    enabled: !!adminToken,
-    staleTime: 1000 * 60 * 5, 
+    enabled: !!clientId, // Only fetch if ID is present
+    staleTime: 1000 * 60 * 5, // Cache for 5 mins
   });
 
   // 2. MUTATION: ADD LOG
@@ -27,18 +28,22 @@ export const useRetainerAdmin = (adminToken: string | undefined) => {
       hours: number;
       date?: string;
     }) => {
-      const { data } = await api.post("/logs", payload);
+      const { data } = await api.post(`/clients/${clientId}/logs`, payload);
       return data.data;
     },
     onSuccess: (newLog) => {
       toast.success("Hours logged successfully");
-      queryClient.setQueryData(queryKey, (old: any) => {
+      // Optimistic Update or Cache Invalidation
+      queryClient.setQueryData(queryKey, (old: Client | undefined) => {
         if (!old) return old;
         return {
           ...old,
-          logs: [newLog, ...old.logs],
+          logs: [newLog, ...(old.logs || [])],
+          // Optionally update local balance here if returned by API
         };
       });
+      // Invalidate to ensure balance calculations are perfect
+      queryClient.invalidateQueries({ queryKey });
     },
     onError: (err: any) => {
       toast.error(err.response?.data?.message || "Failed to log hours");
@@ -48,49 +53,45 @@ export const useRetainerAdmin = (adminToken: string | undefined) => {
   // 3. MUTATION: DELETE LOG
   const deleteLogMutation = useMutation({
     mutationFn: async (logId: string) => {
-      await api.delete(`/logs/${logId}`);
+      // Note: Endpoint changed to match resource-oriented logic
+      await api.delete(`/clients/logs/${logId}`);
       return logId;
     },
     onSuccess: (deletedLogId) => {
       toast.success("Log removed");
-      queryClient.setQueryData(queryKey, (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          logs: old.logs.filter((log: any) => log.id !== deletedLogId),
-        };
-      });
+      queryClient.invalidateQueries({ queryKey });
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Failed to delete log");
     },
   });
 
   // 4. MUTATION: UPDATE STATUS
   const updateStatusMutation = useMutation({
     mutationFn: async (status: ClientStatus) => {
-      const { data } = await api.patch("/clients/status", { status });
+      const { data } = await api.patch(`/clients/${clientId}/status`, {
+        status,
+      });
       return data.data;
     },
     onSuccess: (updatedClient) => {
       toast.success(`Status updated to ${updatedClient.status}`);
-      queryClient.setQueryData(queryKey, (old: any) => ({
+      queryClient.setQueryData(queryKey, (old: Client | undefined) => ({
         ...old,
         status: updatedClient.status,
       }));
     },
   });
 
-  // 5. MUTATION: UPDATE DETAILS (Name, Link, Total Budget)
+  // 5. MUTATION: UPDATE DETAILS (Settings)
   const updateDetailsMutation = useMutation({
-    mutationFn: async (payload: {
-      name?: string;
-      refillLink?: string;
-      totalHours?: number;
-    }) => {
-      const { data } = await api.patch("/clients/details", payload);
+    mutationFn: async (payload: { name?: string; refillLink?: string }) => {
+      const { data } = await api.patch(`/clients/${clientId}`, payload);
       return data.data;
     },
     onSuccess: (updatedClient) => {
       toast.success("Project updated successfully");
-      queryClient.setQueryData(queryKey, (old: any) => {
+      queryClient.setQueryData(queryKey, (old: Client | undefined) => {
         if (!old) return updatedClient;
         return { ...old, ...updatedClient };
       });
@@ -98,16 +99,15 @@ export const useRetainerAdmin = (adminToken: string | undefined) => {
     onError: () => toast.error("Failed to update project"),
   });
 
-  // 6. MUTATION: DELETE PROJECT (New)
+  // 6. MUTATION: DELETE PROJECT
   const deleteProjectMutation = useMutation({
     mutationFn: async () => {
-      const { data } = await api.delete("/clients/details");
-      return data;
+      await api.delete(`/clients/${clientId}`);
     },
     onSuccess: () => {
-      clearAuthToken();
-      toast.success("Project deleted permanently");
+      toast.success("Project deleted");
       queryClient.removeQueries({ queryKey });
+      // Usually you'd navigate back to dashboard here
     },
     onError: (err: any) => {
       toast.error(err.response?.data?.message || "Failed to delete project");
@@ -117,14 +117,12 @@ export const useRetainerAdmin = (adminToken: string | undefined) => {
   // 7. ACTION: EXPORT EXCEL REPORT
   const exportReportMutation = useMutation({
     mutationFn: async () => {
-      // ✅ No manual header needed; the interceptor handles it.
-      const response = await api.get("/export", {
-        responseType: "blob", // Critical for file downloads
+      const response = await api.get(`/clients/${clientId}/export`, {
+        responseType: "blob",
       });
       return response;
     },
     onSuccess: (response) => {
-      // Create a URL for the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -142,25 +140,17 @@ export const useRetainerAdmin = (adminToken: string | undefined) => {
       link.setAttribute("download", fileName);
       document.body.appendChild(link);
       link.click();
-
-      // Cleanup
       link.remove();
-      window.URL.revokeObjectURL(url);
       toast.success("Report downloaded");
     },
-    onError: () => {
-      toast.error("Failed to download report");
-    },
+    onError: () => toast.error("Failed to download report"),
   });
 
   return {
-    // Data
     client: query.data,
     isLoading: query.isLoading,
     isError: query.isError,
-    refetch: query.refetch,
 
-    // Actions
     addLog: addLogMutation.mutate,
     isAddingLog: addLogMutation.isPending,
 

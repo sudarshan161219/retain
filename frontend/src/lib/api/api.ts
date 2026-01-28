@@ -1,37 +1,26 @@
 import axios from "axios";
 
-// 1. Constant for the storage key to avoid typos across files
-export const AUTH_TOKEN_KEY = "retain_auth_token";
-
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
+  // CRITICAL: This tells the browser to include the 'jwt' cookie in requests
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-// 2. Request Interceptor
-api.interceptors.request.use(
-  (config) => {
-    const adminToken = localStorage.getItem(AUTH_TOKEN_KEY);
-
-    if (adminToken) {
-      // Backend expects: "Authorization: Bearer <uuid>"
-      config.headers.Authorization = `Bearer ${adminToken}`;
-    }
-
-    return config;
-  },
+// Optional: Global Error Handler
+api.interceptors.response.use(
+  (response) => response,
   (error) => {
+    // If 401 (Unauthorized), it means the cookie is expired or missing.
+    // React Query will handle the UI state (redirect to login), 
+    // but we can log it here for debugging.
+    if (error.response?.status === 401) {
+      console.debug("Session expired or unauthorized.");
+    }
     return Promise.reject(error);
   }
 );
-
-// 3. Helper to set token (Use this in Landing.tsx and AdminManage.tsx)
-export const setAuthToken = (token: string) => {
-  localStorage.setItem(AUTH_TOKEN_KEY, token);
-};
-
-// 4. Helper to clear token (Use for Logout)
-export const clearAuthToken = () => {
-  localStorage.removeItem(AUTH_TOKEN_KEY);
-};
 
 export default api;

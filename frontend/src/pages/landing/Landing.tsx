@@ -1,61 +1,39 @@
-import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./index.module.css";
 import { Feature } from "@/components/feature/Feature";
-import { formatDuration } from "@/lib/formatters";
-import api, { setAuthToken } from "@/lib/api/api";
-
+import { useUser } from "@/hooks/user/useUser";
+import { Button } from "@/components/ui/button";
 import {
-  ArrowRight,
-  Clock,
-  Link,
-  BarChart3,
-  Loader2,
-  Twitter,
-  Coffee,
+  Github,
+  Server,
+  ShieldCheck,
   Zap,
-  Lock,
-  Eye,
+  LayoutDashboard,
+  Box,
+  Copy,
+  Check,
+  Link,
 } from "lucide-react";
+import { useState } from "react";
 
 export const Landing = () => {
   const navigate = useNavigate();
 
-  // State for the new dual-input form
-  const [name, setName] = useState("");
-  const [totalHours, setTotalHours] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { data: user } = useUser();
+  const [copied, setCopied] = useState(false);
 
-  const handleStart = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (loading || !name.trim() || !totalHours) return;
+  const dockerCommand = `docker run -d -p 3000:3000 \\
+  -e DATABASE_URL=postgresql://... \\
+  ghcr.io/sudarshan161219/retain:latest`;
 
-    setLoading(true);
+  const copyCommand = () => {
+    navigator.clipboard.writeText(dockerCommand);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-    try {
-      // 1. Call the new /clients endpoint
-      const { data } = await api.post<{
-        data: { adminToken: string; slug: string };
-      }>("/clients", {
-        name,
-        totalHours: Number(totalHours),
-      });
-
-      const { adminToken } = data.data;
-
-      // 2. Save Admin Token & Redirect to the Admin Manager
-      setAuthToken(adminToken);
-      navigate(`/manage/${adminToken}`);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        alert(error.response?.data?.message ?? "Failed to create retainer");
-      } else {
-        alert("Unexpected error occurred");
-      }
-    } finally {
-      setLoading(false);
-    }
+  const handleCTA = () => {
+    navigate(user ? "/dashboard" : "/login");
   };
 
   return (
@@ -63,211 +41,200 @@ export const Landing = () => {
       {/* NAVBAR */}
       <nav className={styles.nav}>
         <div className={styles.brand}>
-          <div className={styles.logo}>
-            {/* Changed icon to Clock/Chart for Retain */}
-            <BarChart3 size={20} strokeWidth={3} />
-          </div>
-          Retain
+          <Box className={styles.icon} size={24} strokeWidth={3} />
+          <span className={styles.heading}>Retain</span>
+          <span className={styles.brandTag}>Self-Hosted</span>
         </div>
 
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+        <div className={styles.navActions}>
           <a
-            href="https://x.com/buildwithSud"
+            href="https://github.com/sudarshan161219/retain"
             target="_blank"
             rel="noreferrer"
-            className={styles.navLink}
-            style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            className="flex items-center gap-2 text-sm font-medium hover:text-black transition-colors"
           >
-            <Twitter size={16} />
-            <span style={{ fontSize: "0.875rem" }}>Updates</span>
+            <Github size={18} />
+            <span className="hidden sm:inline">Star on GitHub</span>
           </a>
 
-          <a
-            href="https://buymeacoffee.com/sudarshanhosalli"
-            target="_blank"
-            rel="noreferrer"
-            className={styles.navLink}
-            style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-          >
-            <Coffee size={16} />
-            <span style={{ fontSize: "0.875rem" }}>Support</span>
-          </a>
+          {user ? (
+            <Button
+              onClick={() => navigate("/dashboard")}
+              className={styles.buttonSecondary}
+            >
+              <LayoutDashboard size={16} />
+              Open Demo Dashboard
+            </Button>
+          ) : (
+            <a
+              href="https://github.com/sudarshan161219/retain"
+              target="_blank"
+              rel="noreferrer"
+              className={styles.buttonSmall}
+            >
+              <Link size={20} />
+              Try Live Demo
+            </a>
+          )}
         </div>
       </nav>
 
-      {/* HERO */}
-      <main className={styles.hero}>
-        <div className={styles.badge}>
-          <span className={styles.pulseDot} />
-          v1.0 Public Beta
+      {/* HERO SECTION */}
+      <main className={styles.heroSection}>
+        {/* Left: Copy */}
+        <div className="flex flex-col gap-6 text-left">
+          <div className={styles.badgesuccess}>
+            <Server size={14} />
+            <span>MIT Licensed & Open Source</span>
+          </div>
+
+          <h1 className={styles.herotitle}>
+            Client retainers, <br />
+            <span className={styles.gradientText}>
+              on your own infrastructure.
+            </span>
+          </h1>
+
+          <p className={styles.subtitle}>
+            Stop paying monthly fees for simple retainer tracking.
+            <strong>Retain</strong> is a lightweight, Dockerized tool you host
+            yourself. Give clients a real-time burn chart without giving away
+            your data.
+          </p>
+
+          <div className="flex flex-wrap gap-4 mt-2">
+            <a
+              href="https://github.com/sudarshan161219/retain"
+              target="_blank"
+              rel="noreferrer"
+              className={styles.buttonLg}
+            >
+              <Github size={20} />
+              View Repository
+            </a>
+            <Button
+              variant="default"
+              className="cursor-pointer"
+              size="lg"
+              onClick={() => navigate("/login")}
+            >
+              <Link size={20} /> Try the Live Demo
+            </Button>
+          </div>
+
+          <p className="text-sm text-(--label) mt-1.5">*Live demo no login.</p>
         </div>
 
-        <h1 className={styles.title}>
-          Stop sending <br />
-          <span className={styles.gradientText}>"hours remaining" emails.</span>
-        </h1>
+        {/* Right: Code Block */}
+        <div className={styles.heroTerminalWrapper}>
+          <div className={styles.heroGlow}></div>
+          {/* The Terminal Window */}
+          <div className={styles.heroTerminal}>
+            {/* Terminal Header */}
+            <div className={styles.terminalHeader}>
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+                <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+              </div>
+              <div className="text-xs text-white/30 font-mono">bash</div>
+            </div>
 
-        <p className={styles.subtitle}>
-          Give your clients a live progress bar for their retainer. You log
-          work, they see the burn rate. Zero friction. No sign-ups.
-        </p>
+            {/* Terminal Body */}
+            <div className={styles.terminalBody}>
+              <div className="flex justify-between items-start">
+                <code className="block mb-4 text-emerald-400">
+                  # Pull and run in seconds
+                </code>
+                <button
+                  onClick={copyCommand}
+                  className="text-gray-500 hover:text-white transition-colors"
+                >
+                  {copied ? (
+                    <Check size={16} className="text-emerald-500" />
+                  ) : (
+                    <Copy size={16} />
+                  )}
+                </button>
+              </div>
 
-        {/* UPDATED FORM: Two Inputs now */}
-        <form onSubmit={handleStart} className={styles.form}>
-          <div className={styles.formGlow} />
-          <div
-            className={styles.formInner}
-            style={{ flexDirection: "column", gap: "0.5rem" }}
-          >
-            {/* Input Group: Flex on desktop, Stack on mobile */}
-            <div style={{ display: "flex", width: "100%", gap: "0.5rem" }}>
-              <input
-                autoFocus
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Client Name (e.g. Acme Corp)"
-                className={styles.input}
-                style={{ flex: 2 }}
-                disabled={loading}
-              />
+              <div className="whitespace-pre text-gray-100">
+                {dockerCommand}
+              </div>
 
-              <div style={{ flex: 1, position: "relative" }}>
-                <input
-                  type="number"
-                  value={totalHours}
-                  onChange={(e) => setTotalHours(e.target.value)}
-                  placeholder="Hours"
-                  className={styles.input}
-                  style={{ width: "100%" }}
-                  disabled={loading}
-                />
-
-                {/* 3. Floating helper text */}
-                {totalHours && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "-25px",
-                      right: "0",
-                      fontSize: "0.75rem",
-                      color: "#64748b",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {formatDuration(Number(totalHours))}
-                  </span>
-                )}
+              <div className="mt-6 text-gray-500">
+                <span className="text-blue-400">➜</span> ~ Container started:
+                <span className="text-emerald-400"> 0.0.0.0:3000</span>
               </div>
             </div>
-
-            <button
-              type="submit"
-              disabled={!name || !totalHours || loading}
-              className={styles.button}
-              style={{ width: "100%" }}
-            >
-              {loading ? (
-                <Loader2 className={styles.spinner} size={18} />
-              ) : (
-                "Create Dashboard"
-              )}
-              {!loading && <ArrowRight size={18} />}
-            </button>
           </div>
-
-          <p className={styles.helperText}>
-            Free forever. No account required.
-          </p>
-        </form>
+        </div>
       </main>
 
-      {/* (Retainer Logic) */}
-      <section className={styles.stepsSection}>
-        <h2 className={styles.sectionTitle}>How it works</h2>
-        <div className={styles.stepsGrid}>
-          <div className={styles.stepCard}>
-            <div className={styles.stepIcon}>
-              <Clock />
-            </div>
-            <h3>1. Set Budget</h3>
-            <p>Define the total hours for the month (e.g. 20 hrs).</p>
+      <section className={styles.audience}>
+        <h2>Perfect for:</h2>
+        <ul>
+          <li>Freelancers just starting out</li>
+          <li>Developers working on monthly retainers</li>
+          <li>Designers managing client hours</li>
+          <li>Anyone tired of tracking in spreadsheets</li>
+        </ul>
+      </section>
+
+      {/* TECH FEATURES */}
+      <section className="bg-gray-50 py-24 border-t border-gray-200">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Why self-host?</h2>
+            <p className="text-gray-500">
+              Built for developers who prefer owning their stack.
+            </p>
           </div>
 
-          <div className={styles.stepArrow}>
-            <ArrowRight />
-          </div>
-
-          <div className={styles.stepCard}>
-            <div className={styles.stepIcon}>
-              <Link />
-            </div>
-            <h3>2. Share Link</h3>
-            <p>Send the unique link. The client sees a live progress bar.</p>
-          </div>
-
-          <div className={styles.stepArrow}>
-            <ArrowRight />
-          </div>
-
-          <div className={styles.stepCard}>
-            <div className={styles.stepIcon}>
-              <BarChart3 />
-            </div>
-            <h3>3. Log Work</h3>
-            <p>Add logs as you go. The progress bar updates instantly.</p>
+          <div className={styles.featuresGrid}>
+            <Feature
+              icon={<Box />}
+              title="Docker Ready"
+              text="Ships as a lightweight container. Run it on a $5 VPS, your Raspberry Pi, or Coolify."
+            />
+            <Feature
+              icon={<ShieldCheck />}
+              title="Data Sovereignty"
+              text="Your client data never leaves your server. No tracking pixels, no third-party analytics."
+            />
+            <Feature
+              icon={<Zap />}
+              title="Zero Overhead"
+              text="Built with React, Node, and Postgres. Fast, minimal resource usage, and easy to maintain."
+            />
           </div>
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className={styles.features}>
-        <div className={styles.featuresGrid}>
-          <Feature
-            icon={<Zap />}
-            title="Real-Time Sync"
-            text="Updates appear instantly on the client's screen via WebSockets."
-          />
-          <Feature
-            icon={<Lock />}
-            title="Private Admin Link"
-            text="You get a secret admin key. No username or password to forget."
-          />
-          <Feature
-            icon={<Eye />}
-            title="Total Transparency"
-            text="Clients see exactly where their money is going, down to the decimal."
-          />
-        </div>
+      <section className={styles.finalCTA}>
+        <h2>Stop worrying about how many hours are left.</h2>
+        <p>Focus on delivering great work. Retain handles the tracking.</p>
+        <button onClick={handleCTA} className={styles.buttonLg}>
+          Create Free Account
+        </button>
       </section>
 
       {/* FOOTER */}
       <footer className={styles.footer}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
-            alignItems: "center",
-          }}
-        >
-          <span>
-            © {new Date().getFullYear()} Retain. Built for Freelancers.
+        <div className="flex flex-col items-center gap-4">
+          <span className="text-sm text-gray-500">
+            Open Source under MIT License.
           </span>
 
-          <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.5rem" }}>
+          <div className="flex gap-6 opacity-60 hover:opacity-100 transition-opacity">
             <a
               href="https://x.com/buildwithSud"
               target="_blank"
               rel="noreferrer"
-              style={{
-                opacity: 0.6,
-                fontSize: "0.8rem",
-                color: "inherit",
-                textDecoration: "none",
-              }}
             >
-              Built by Sudarshan
+              <span className="text-sm font-semibold hover:underline">
+                Created by @buildwithSud
+              </span>
             </a>
           </div>
         </div>

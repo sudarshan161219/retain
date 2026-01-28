@@ -1,16 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import api, { setAuthToken } from "@/lib/api/api";
+import api from "@/lib/api/api";
 import { toast } from "sonner";
 
-export const useClientRefill = (adminToken: string | undefined) => {
+export const useClientRefill = (clientId: string | undefined) => {
   const queryClient = useQueryClient();
-  const queryKey = ["admin-client", adminToken];
+  const queryKey = ["admin-client", clientId];
 
   const refillMutation = useMutation({
     mutationFn: async (payload: { hours: number; createLog: boolean }) => {
-      if (adminToken) setAuthToken(adminToken);
-
-      const { data } = await api.post("/clients/refill", payload);
+      const { data } = await api.post(`/clients/${clientId}/refill`, payload);
       return data;
     },
     onSuccess: (_, variables) => {

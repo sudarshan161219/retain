@@ -13,13 +13,14 @@ import {
 } from "lucide-react";
 import { useModalStore } from "@/store/modalStore/useModalStore";
 import { useRetainerAdmin } from "@/hooks/client/useRetainerAdmin";
-import { clearAuthToken } from "@/lib/api/api";
+import { useLogout } from "@/hooks/user/useLogout";
 import { useThemeStore } from "@/store/theme/useThemeStore";
 import styles from "./index.module.css";
 
 export const DashboardNavbar = () => {
   const { adminToken } = useParams();
   const navigate = useNavigate();
+  const { mutate: logout, isPending } = useLogout();
   const { openModal } = useModalStore();
   const { theme, toggleLight, toggleDark } = useThemeStore();
 
@@ -28,7 +29,7 @@ export const DashboardNavbar = () => {
 
   // 2. Handle Logout
   const handleLogout = () => {
-    clearAuthToken();
+    logout();
     navigate("/");
   };
 
@@ -180,6 +181,7 @@ export const DashboardNavbar = () => {
             onClick={handleExitClick}
             title="Exit Dashboard"
             className={styles.exitButton}
+            disabled={isPending}
           >
             <LogOut size={16} />
             <span className={styles.brandText}>Exit</span>
