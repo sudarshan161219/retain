@@ -7,10 +7,11 @@
 .feature h3 {
   font-size: 1.25rem;
   font-weight: 700;
+  color: var(--primary);
 }
 
 .feature p {
-  color: #a1a1aa;
+  color: var(--label);
   line-height: 1.6;
 }
 
@@ -18,4 +19,5 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  color: var(--primary);
 }

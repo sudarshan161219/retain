@@ -79,7 +79,7 @@ export const DashboardNavbar = () => {
     });
   };
 
-  // 4. Handle Theme Toggle
+  // Handle Theme Toggle
   const handleThemeToggle = () => {
     if (theme === "dark") {
       toggleLight();

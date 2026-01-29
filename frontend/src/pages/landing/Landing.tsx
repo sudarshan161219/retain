@@ -12,13 +12,13 @@ import {
   Box,
   Copy,
   Check,
-  Link,
+  ExternalLink,
+  ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
 
 export const Landing = () => {
   const navigate = useNavigate();
-
   const { data: user } = useUser();
   const [copied, setCopied] = useState(false);
 
@@ -51,192 +51,194 @@ export const Landing = () => {
             href="https://github.com/sudarshan161219/retain"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-2 text-sm font-medium hover:text-black transition-colors"
+            className={styles.linkButton}
           >
             <Github size={18} />
-            <span className="hidden sm:inline">Star on GitHub</span>
+            <span className={styles.hideMobile}>Star on GitHub</span>
           </a>
 
-          {user ? (
-            <Button
-              onClick={() => navigate("/dashboard")}
-              className={styles.buttonSecondary}
-            >
-              <LayoutDashboard size={16} />
-              Open Demo Dashboard
-            </Button>
-          ) : (
-            <a
-              href="https://github.com/sudarshan161219/retain"
-              target="_blank"
-              rel="noreferrer"
-              className={styles.buttonSmall}
-            >
-              <Link size={20} />
-              Try Live Demo
-            </a>
-          )}
+          <Button onClick={handleCTA} className="cursor-pointer">
+            {user ? <LayoutDashboard size={18} /> : <ChevronRight size={18} />}
+            {user ? "Dashboard" : "Get Started"}
+          </Button>
         </div>
       </nav>
 
-      {/* HERO SECTION */}
+      {/* HERO SECTION  */}
       <main className={styles.heroSection}>
-        {/* Left: Copy */}
-        <div className="flex flex-col gap-6 text-left">
-          <div className={styles.badgesuccess}>
+        <div className={styles.heroContent}>
+          <div className={styles.badgeSuccess}>
             <Server size={14} />
-            <span>MIT Licensed & Open Source</span>
+            <span>v1.0.0 is now live</span>
           </div>
 
-          <h1 className={styles.herotitle}>
-            Client retainers, <br />
+          <h1 className={styles.heroTitle}>
+            The open-source <br />
             <span className={styles.gradientText}>
-              on your own infrastructure.
+              retainer tracker for creators.
             </span>
           </h1>
 
           <p className={styles.subtitle}>
-            Stop paying monthly fees for simple retainer tracking.
-            <strong>Retain</strong> is a lightweight, Dockerized tool you host
-            yourself. Give clients a real-time burn chart without giving away
-            your data.
+            Stop wrestling with spreadsheets. <strong>Retain</strong> gives you
+            and your clients a beautiful, real-time look at project hours and
+            burn rates. Complete privacy, hosted by you.
           </p>
 
-          <div className="flex flex-wrap gap-4 mt-2">
+          <div className={styles.heroActions}>
+            <a
+              href="https://retain-frontend-gamma.vercel.app"
+              target="_blank"
+              rel="noreferrer"
+              className={styles.linkButton}
+            >
+              <ExternalLink size={20} />
+              Try Live Demo
+            </a>
+
             <a
               href="https://github.com/sudarshan161219/retain"
               target="_blank"
               rel="noreferrer"
-              className={styles.buttonLg}
+              className={styles.buttonSecondary}
             >
               <Github size={20} />
               View Repository
             </a>
-            <Button
-              variant="default"
-              className="cursor-pointer"
-              size="lg"
-              onClick={() => navigate("/login")}
-            >
-              <Link size={20} /> Try the Live Demo
-            </Button>
           </div>
 
-          <p className="text-sm text-(--label) mt-1.5">*Live demo no login.</p>
-        </div>
-
-        {/* Right: Code Block */}
-        <div className={styles.heroTerminalWrapper}>
-          <div className={styles.heroGlow}></div>
-          {/* The Terminal Window */}
-          <div className={styles.heroTerminal}>
-            {/* Terminal Header */}
-            <div className={styles.terminalHeader}>
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-                <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-                <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
-              </div>
-              <div className="text-xs text-white/30 font-mono">bash</div>
-            </div>
-
-            {/* Terminal Body */}
-            <div className={styles.terminalBody}>
-              <div className="flex justify-between items-start">
-                <code className="block mb-4 text-emerald-400">
-                  # Pull and run in seconds
-                </code>
-                <button
-                  onClick={copyCommand}
-                  className="text-gray-500 hover:text-white transition-colors"
-                >
-                  {copied ? (
-                    <Check size={16} className="text-emerald-500" />
-                  ) : (
-                    <Copy size={16} />
-                  )}
-                </button>
-              </div>
-
-              <div className="whitespace-pre text-gray-100">
-                {dockerCommand}
-              </div>
-
-              <div className="mt-6 text-gray-500">
-                <span className="text-blue-400">➜</span> ~ Container started:
-                <span className="text-emerald-400"> 0.0.0.0:3000</span>
-              </div>
-            </div>
-          </div>
+          <p className={styles.disclaimer}>
+            No credit card. No cloud fees. Your data, your rules.
+          </p>
         </div>
       </main>
 
-      <section className={styles.audience}>
-        <h2>Perfect for:</h2>
-        <ul>
-          <li>Freelancers just starting out</li>
-          <li>Developers working on monthly retainers</li>
-          <li>Designers managing client hours</li>
-          <li>Anyone tired of tracking in spreadsheets</li>
-        </ul>
-      </section>
-
-      {/* TECH FEATURES */}
-      <section className="bg-gray-50 py-24 border-t border-gray-200">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Why self-host?</h2>
-            <p className="text-gray-500">
-              Built for developers who prefer owning their stack.
+      {/* DOCKER SECTION */}
+      <section className={styles.dockerSection}>
+        <div className={styles.darkCard}>
+          <div className={styles.cardContent}>
+            <h3 className={styles.cardTitle}>Deploy in seconds.</h3>
+            <p className={styles.cardText}>
+              Prefer to host it yourself? Retain is built to be portable. Drop
+              our image into your favorite orchestrator and you're ready to go.
             </p>
+
+            <div className={styles.techStack}>
+              <div className={styles.iconGroup}>
+                <div className={`${styles.techIcon} ${styles.blueIcon}`}>
+                  DKR
+                </div>
+                <div className={`${styles.techIcon} ${styles.greenIcon}`}>
+                  K8S
+                </div>
+              </div>
+              <span className={styles.techLabel}>Image size: ~45MB</span>
+            </div>
           </div>
 
-          <div className={styles.featuresGrid}>
-            <Feature
-              icon={<Box />}
-              title="Docker Ready"
-              text="Ships as a lightweight container. Run it on a $5 VPS, your Raspberry Pi, or Coolify."
-            />
+          <div className={styles.cardTerminalWrapper}>
+            <div className={styles.heroTerminal}>
+              <div className={styles.terminalHeader}>
+                <div className={styles.dots}>
+                  <div className={styles.dotRed} />
+                  <div className={styles.dotYellow} />
+                  <div className={styles.dotGreen} />
+                </div>
+                <div className={styles.terminalLabel}>Quick Deployment</div>
+              </div>
+
+              <div className={styles.terminalBody}>
+                <div className={styles.commandRow}>
+                  <code className={styles.comment}>
+                    # Standard Docker Install
+                  </code>
+                  <button onClick={copyCommand} className={styles.copyBtn}>
+                    {copied ? (
+                      <Check size={14} className={styles.checkIcon} />
+                    ) : (
+                      <Copy size={14} />
+                    )}
+                  </button>
+                </div>
+                <div className={styles.codeBlock}>{dockerCommand}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AUDIENCE & FEATURES */}
+      <section className={styles.audienceSection}>
+        <div className={styles.audienceGrid}>
+          <div className={styles.audienceContent}>
+            <h2 className={styles.sectionHeading}>
+              Built for the <br />
+              modern freelancer.
+            </h2>
+            <ul className={styles.checkList}>
+              {[
+                "Freelancers managing multiple clients",
+                "Agency owners tired of SaaS overhead",
+                "Developers who value data sovereignty",
+                "Designers needing clear burn-down charts",
+              ].map((item, idx) => (
+                <li key={idx} className={styles.checkItem}>
+                  <div className={styles.checkIconWrapper}>
+                    <Check size={12} strokeWidth={3} />
+                  </div>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className={styles.featuresList}>
             <Feature
               icon={<ShieldCheck />}
-              title="Data Sovereignty"
-              text="Your client data never leaves your server. No tracking pixels, no third-party analytics."
+              title="Privacy First"
+              text="Your client data never leaves your server. Period."
             />
             <Feature
               icon={<Zap />}
-              title="Zero Overhead"
-              text="Built with React, Node, and Postgres. Fast, minimal resource usage, and easy to maintain."
+              title="Lightweight"
+              text="Optimized for low-resource environments and fast loads."
             />
           </div>
         </div>
       </section>
 
+      {/* CTA */}
       <section className={styles.finalCTA}>
-        <h2>Stop worrying about how many hours are left.</h2>
-        <p>Focus on delivering great work. Retain handles the tracking.</p>
-        <button onClick={handleCTA} className={styles.buttonLg}>
-          Create Free Account
-        </button>
+        <div className={styles.ctaContent}>
+          <h2>Take full control of your client retainers.</h2>
+          <p>
+            Professional tracking, transparent reporting, and total data
+            sovereignty.
+          </p>
+          <Button onClick={handleCTA} className="cursor-pointer">
+            Get Started
+          </Button>
+        </div>
       </section>
 
       {/* FOOTER */}
       <footer className={styles.footer}>
-        <div className="flex flex-col items-center gap-4">
-          <span className="text-sm text-gray-500">
-            Open Source under MIT License.
-          </span>
-
-          <div className="flex gap-6 opacity-60 hover:opacity-100 transition-opacity">
-            <a
-              href="https://x.com/buildwithSud"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span className="text-sm font-semibold hover:underline">
-                Created by @buildwithSud
-              </span>
-            </a>
+        <div className={styles.footerContent}>
+          <div className={styles.footerBrand}>
+            <Box className={styles.footerIcon} size={20} />
+            <span className={styles.footerLogo}>Retain</span>
           </div>
+          <span className={styles.copyright}>
+            Released under the MIT License.
+          </span>
+          <a
+            href="https://x.com/buildwithSud"
+            target="_blank"
+            rel="noreferrer"
+            className={styles.creatorLink}
+          >
+            Created by @buildwithSud
+          </a>
         </div>
       </footer>
     </div>
