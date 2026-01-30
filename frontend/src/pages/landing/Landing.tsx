@@ -3,6 +3,7 @@ import styles from "./index.module.css";
 import { Feature } from "@/components/feature/Feature";
 import { useUser } from "@/hooks/user/useUser";
 import { Button } from "@/components/ui/button";
+
 import {
   Github,
   Server,
@@ -21,7 +22,6 @@ export const Landing = () => {
   const navigate = useNavigate();
   const { data: user } = useUser();
   const [copied, setCopied] = useState(false);
-
   const dockerCommand = `docker run -d -p 3000:3000 \\
   -e DATABASE_URL=postgresql://... \\
   ghcr.io/sudarshan161219/retain:latest`;
@@ -33,7 +33,11 @@ export const Landing = () => {
   };
 
   const handleCTA = () => {
-    navigate(user ? "/dashboard" : "/login");
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      navigate("/auth");
+    }
   };
 
   return (

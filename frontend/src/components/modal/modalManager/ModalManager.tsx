@@ -1,7 +1,7 @@
 import { useModalStore } from "@/store/modalStore/useModalStore";
 import { ExportModal } from "../exportModal/ExportModal";
 import { RefillModal } from "../refillModal/RefillModal";
-import { WarningModal } from "../WarningModal/WarningModal"; // We will create this below
+import { WarningModal } from "../WarningModal/WarningModal";
 
 export const ModalManager = () => {
   const { isOpen, type } = useModalStore();

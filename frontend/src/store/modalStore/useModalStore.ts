@@ -5,6 +5,7 @@ export type ModalType =
   | "CREATE_PROJECT"
   | "EXPORT_REPORT"
   | "REFILL_BALANCE"
+  | "AUTH"
   | null;
 
 interface ModalData {
