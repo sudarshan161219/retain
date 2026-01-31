@@ -182,7 +182,6 @@ export class AuthController {
    */
   async oauthCallback(req: Request, res: Response, next: NextFunction) {
     try {
-      // Passport populates req.user. Cast it to expected type (UUID string).
       const user = req.user as { id: string; email: string };
 
       if (!user) {
@@ -237,13 +236,13 @@ export class AuthController {
    */
   async googleAuthAPI(req: Request, res: Response, next: NextFunction) {
     try {
-      const { code, mode } = req.body;
+      const { code } = req.body;
 
-      if (!code || !mode) {
-        return res.status(400).json({ message: "Missing code or mode" });
+      if (!code) {
+        return res.status(400).json({ message: "Missing code" });
       }
 
-      const token = await this.authService.handleGoogleAuth({ code, mode });
+      const token = await this.authService.handleGoogleAuth({ code });
 
       res.cookie("jwt", token, {
         httpOnly: true,
@@ -266,13 +265,13 @@ export class AuthController {
    */
   async githubAuthAPI(req: Request, res: Response, next: NextFunction) {
     try {
-      const { code, mode } = req.body;
+      const { code } = req.body;
 
-      if (!code || !mode) {
-        return res.status(400).json({ message: "Missing code or mode" });
+      if (!code) {
+        return res.status(400).json({ message: "Missing code" });
       }
 
-      const token = await this.authService.handleGitHubAuth({ code, mode });
+      const token = await this.authService.handleGitHubAuth({ code });
 
       res.cookie("jwt", token, {
         httpOnly: true,

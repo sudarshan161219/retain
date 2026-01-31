@@ -288,7 +288,6 @@ export class AuthService {
         expiresIn: "30d",
       });
 
-      // REMOVED: Redis session storage. Token is stateless.
       return token;
     } catch (error) {
       throw new AppError({
@@ -311,6 +310,7 @@ export class AuthService {
     const email = payload?.email;
     const name = payload?.name || "Google User";
     const profileImage = payload?.picture || "";
+    const sub = payload?.sub;
 
     if (!email) {
       throw new AppError({
@@ -319,7 +319,7 @@ export class AuthService {
       });
     }
 
-    return { email, name, profileImage };
+    return { email, name, profileImage, sub };
   }
 
   async exchangeCodeForIdToken(code: string): Promise<string> {
@@ -351,59 +351,40 @@ export class AuthService {
     }
   }
 
-  async handleGoogleAuth({
-    code,
-    mode,
-  }: {
-    code: string;
-    mode: "login" | "register";
-  }) {
+  async handleGoogleAuth({ code }: { code: string }) {
     const idToken = await this.exchangeCodeForIdToken(code);
-    const { email, name, profileImage } = await this.verifyGoogleToken(idToken);
+    const { email, name, profileImage, sub } =
+      await this.verifyGoogleToken(idToken);
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    let user = await prisma.user.findUnique({ where: { email } });
 
-    if (mode === "login") {
-      if (!existingUser) {
-        throw new AppError({
-          message: "User not found. Please register.",
-          statusCode: 401,
-        });
-      }
-      return this.generateOAuthToken(existingUser);
-    }
-
-    if (mode === "register") {
-      if (existingUser) {
-        throw new AppError({
-          message: "User already exists. Please log in.",
-          statusCode: 400,
-        });
-      }
-
-      const newUser = await prisma.user.create({
+    if (user) {
+      user = await prisma.user.update({
+        where: {
+          email: email,
+        },
         data: {
           name,
           email,
-          profileImage,
-          provider: "google",
-          googleId: "unknown",
+          avatar: profileImage,
         },
       });
-
-      return this.generateOAuthToken(newUser);
+    } else {
+      user = await prisma.user.create({
+        data: {
+          name,
+          email,
+          avatar: profileImage,
+          provider: "google",
+          googleId: sub || "unknown",
+        },
+      });
     }
 
-    throw new AppError({ message: "Invalid mode", statusCode: 400 });
+    return this.generateOAuthToken(user);
   }
 
-  async handleGitHubAuth({
-    code,
-    mode,
-  }: {
-    code: string;
-    mode: "login" | "register";
-  }) {
+  async handleGitHubAuth({ code }: { code: string }) {
     const { data } = await axios.post(
       "https://github.com/login/oauth/access_token",
       {
@@ -422,49 +403,46 @@ export class AuthService {
       });
     }
 
-    const userRes = await axios.get("https://api.github.com/user", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const [userRes, emailRes] = await Promise.all([
+      axios.get("https://api.github.com/user", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }),
+      axios.get("https://api.github.com/user/emails", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }),
+    ]);
 
-    const emailRes = await axios.get("https://api.github.com/user/emails", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
-    const email = emailRes.data.find((e: any) => e.primary)?.email;
+    const emailData = emailRes.data.find((e: any) => e.primary && e.verified);
+    const email = emailData?.email;
     const name = userRes.data.name || userRes.data.login;
     const profileImage = userRes.data.avatar_url;
+    const githubId = String(userRes.data.id);
 
     if (!email) {
       throw new AppError({ message: "No email found", statusCode: 400 });
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    let user = await prisma.user.findUnique({ where: { email } });
 
-    if (mode === "login") {
-      if (!existingUser) {
-        throw new AppError({ message: "User not found", statusCode: 401 });
+    if (user) {
+      if (!user.githubId) {
+        user = await prisma.user.update({
+          where: { email },
+          data: { githubId },
+        });
       }
-      return this.generateOAuthToken(existingUser);
-    }
-
-    if (mode === "register") {
-      if (existingUser) {
-        throw new AppError({ message: "User already exists", statusCode: 400 });
-      }
-
-      const newUser = await prisma.user.create({
+    } else {
+      user = await prisma.user.create({
         data: {
           name,
           email,
-          profileImage,
+          avatar: profileImage,
           provider: "github",
-          githubId: String(userRes.data.id),
+          githubId: githubId,
         },
       });
-
-      return this.generateOAuthToken(newUser);
     }
 
-    throw new AppError({ message: "Invalid mode", statusCode: 400 });
+    return this.generateOAuthToken(user);
   }
 }
