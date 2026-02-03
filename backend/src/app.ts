@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import type { Application } from "express";
 import express from "express";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import { createServer, Server } from "node:http";
 import { initSocket } from "./socket/index.js";
@@ -47,6 +48,7 @@ export class App {
       }),
     );
     this.app.use(express.json());
+    this.app.use(cookieParser());
 
     this.app.use(
       cors({

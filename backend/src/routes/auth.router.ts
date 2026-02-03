@@ -7,7 +7,7 @@ import {
 import { injectable, inject } from "inversify";
 import { AuthController } from "../controllers/auth.controller.js";
 import { TYPES } from "../types/types.js";
-import passport from "passport";
+import { configuredPassport as passport } from "../config/passport.js";
 import { authenticate } from "../middlewares/auth/auth.middleware.js";
 import { validate } from "../middlewares/validate/validate.middleware.js";
 
@@ -80,7 +80,7 @@ export class AuthRouter {
      */
     this.router.get(
       "/me",
-      authenticate, // 🔒
+      authenticate,
       (req: Request, res: Response, next: NextFunction) =>
         this.authController.handleMe(req, res, next),
     );
@@ -91,7 +91,7 @@ export class AuthRouter {
      */
     this.router.patch(
       "/update",
-      authenticate, // 🔒
+      authenticate,
       (req: Request, res: Response, next: NextFunction) =>
         this.authController.handleUpdate(req, res, next),
     );
@@ -120,14 +120,23 @@ export class AuthRouter {
     // OAUTH ROUTES
     // ==========================================
 
-    // 1. Google (API / Mobile Mode)
-    this.router.post(
+    // --- GOOGLE  (API / Mobile Mode) ---
+    // this.router.post(
+    //   "/google",
+    //   (req: Request, res: Response, next: NextFunction) =>
+    //     this.authController.googleAuthAPI(req, res, next),
+    // );
+
+    // --- GOOGLE ---
+    this.router.get(
       "/google",
-      (req: Request, res: Response, next: NextFunction) =>
-        this.authController.googleAuthAPI(req, res, next),
+      passport.authenticate("google", {
+        scope: ["profile", "email"],
+        session: false,
+      }),
     );
 
-    // 2. Google (Passport / Redirect Mode)
+    // Callback: Google
     this.router.get(
       "/google/callback",
       passport.authenticate("google", {
@@ -138,22 +147,49 @@ export class AuthRouter {
         this.authController.oauthCallback(req, res, next),
     );
 
-    // 3. GitHub (API / Mobile Mode)
-    this.router.post(
-      "/github",
-      (req: Request, res: Response, next: NextFunction) =>
-        this.authController.githubAuthAPI(req, res, next),
-    );
+    // --- GitHub (API / Mobile Mode) ---
+    // this.router.post(
+    //   "/github",
+    //   (req: Request, res: Response, next: NextFunction) =>
+    //     this.authController.githubAuthAPI(req, res, next),
+    // );
+
+    // --- GITHUB ---
+    // this.router.get(
+    //   "/github",
+    //   passport.authenticate("github", {
+    //     scope: ["user:email"],
+    //     session: false,
+    //   }),
+    // );
 
     // 4. GitHub (Passport / Redirect Mode)
     this.router.get(
       "/github/callback",
-      passport.authenticate("github", {
-        failureRedirect: "/login?error=oauth_failed",
-        session: false,
-      }),
-      (req: Request, res: Response, next: NextFunction) =>
-        this.authController.oauthCallback(req, res, next),
+      (req, res, next) => {
+        // 1. Authenticate using the code sent from frontend
+        passport.authenticate(
+          "github",
+          { session: false },
+          (err, user, info) => {
+            if (err) {
+              // This logs the "redirect_uri_mismatch" if urls don't match
+              console.error("GitHub Strategy Error:", err);
+              return res
+                .status(500)
+                .json({ message: "Auth failed", error: err.message });
+            }
+
+            if (!user) {
+              return res.status(401).json({ message: "No user found" });
+            }
+
+            req.user = user;
+            next(); // Proceed to controller
+          },
+        )(req, res, next);
+      },
+      (req: Request, res: Response, next: NextFunction) => this.authController.oauthCallback(req, res, next),
     );
   }
 }

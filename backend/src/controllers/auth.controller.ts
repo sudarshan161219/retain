@@ -32,7 +32,6 @@ export class AuthController {
         req.body,
       );
 
-      // Set HttpOnly Cookie (Named 'jwt' for consistency)
       res.cookie("jwt", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -42,7 +41,7 @@ export class AuthController {
 
       res.status(StatusCodes.OK).json({
         user,
-        // Only send token in body for dev debugging, usually not needed in prod if using cookies
+
         ...(process.env.NODE_ENV !== "production" && { token }),
       });
     } catch (error) {
@@ -55,20 +54,17 @@ export class AuthController {
    */
   async handleLogout(req: Request, res: Response, next: NextFunction) {
     try {
-      // 1. Check for cookie
       const token = req.cookies.jwt;
       if (!token) {
         return res.status(StatusCodes.NO_CONTENT).send();
       }
 
-      // 2. Clear the cookie
       res.clearCookie("jwt", {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
 
-      // 3. Call service (Stateless, but good for logs/hooks)
       await this.authService.logout(token);
 
       res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
@@ -82,8 +78,6 @@ export class AuthController {
    */
   async handleMe(req: Request, res: Response, next: NextFunction) {
     try {
-      // req.user is populated by 'authenticate' middleware
-      // We assume userId is a String (UUID)
       const userId = req.user?.id;
 
       if (!userId) {
@@ -186,7 +180,7 @@ export class AuthController {
 
       if (!user) {
         throw new AppError({
-          message: "Authentication failed",
+          message: "Authentication failed: User not found",
           statusCode: 401,
         });
       }
@@ -200,33 +194,13 @@ export class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      // Send HTML to close popup and notify parent window
-      const html = `
-      <html>
-        <body>
-          <script>
-            window.opener.postMessage({ type: "oauth-success", token: "${token}" }, "*");
-            window.close();
-          </script>
-        </body>
-      </html>
-    `;
-      res.send(html);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Login successful",
+        id: user.id,
+      });
     } catch (error) {
-      // Handle error in popup
-      const message =
-        error instanceof AppError ? error.message : "OAuth failed";
-      const html = `
-      <html>
-        <body>
-          <script>
-            window.opener.postMessage({ type: "oauth-error", message: "${message}" }, "*");
-            window.close();
-          </script>
-        </body>
-      </html>
-    `;
-      res.send(html);
+      next(error);
     }
   }
 

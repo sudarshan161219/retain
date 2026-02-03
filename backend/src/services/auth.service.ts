@@ -127,12 +127,16 @@ export class AuthService {
   }
 
   async me(userId: string) {
-    // Changed to string to match UUID
     try {
-      // Direct Database Call (No Redis Cache)
       const user = await prisma.user.findUnique({
         where: { id: userId },
-        select: { id: true, name: true, email: true, createdAt: true },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          createdAt: true,
+          avatar: true,
+        },
       });
 
       if (!user) {
@@ -159,7 +163,6 @@ export class AuthService {
   }
 
   async update(userId: string, data: UpdateUserDTO) {
-    // Changed to string
     try {
       const updatedUser = await prisma.user.update({
         where: { id: userId },

@@ -1,18 +1,15 @@
-import { Outlet } from "react-router-dom";
-import { DashboardNavbar } from "@/components/dashboardNavbar/DashboardNavbar";
-import { ModalManager } from "@/components/modal/modalManager/ModalManager";
+import { useEffect, useState } from "react";
+import { MobileSidebar } from "@/layouts/mobileSidebar/MobileSidebar";
+import { DesktopSidebar } from "@/layouts/desktopSidebar/DesktopSidebar";
 
 export const DashboardLayout = () => {
-  return (
-    <div className="min-h-screen bg-black text-gray-100 font-sans">
-      {/* The New Clean Navbar */}
-      <DashboardNavbar />
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-      {/* Page Content */}
-      <main className="animate-in fade-in duration-500">
-        <Outlet />
-        <ModalManager />
-      </main>
-    </div>
-  );
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return isMobile ? <MobileSidebar /> : <DesktopSidebar />;
 };

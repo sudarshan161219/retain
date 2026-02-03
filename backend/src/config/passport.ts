@@ -6,13 +6,11 @@ import {
 import { type Profile as GitHubProfile } from "passport-github2";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import type { VerifyCallback } from "passport-oauth2";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../utils/prismaClient.js";
 import { AppError } from "../errors/AppError.js";
 
-const prisma = new PrismaClient();
-
 const getCallbackUrl = (provider: string): string => {
-  return `${process.env.API_BASE_URL}/auth/${provider}/callback`;
+  return `http://localhost:5173/auth/${provider}/callback`;
 };
 
 passport.use(
@@ -42,27 +40,24 @@ passport.use(
           );
         }
 
-        let user = await prisma.user.findUnique({ where: { email } });
+        // FIX: Use upsert to handle race conditions atomically
+        // Note: This assumes your Prisma schema has a unique constraint on 'email'
+        const user = await prisma.user.upsert({
+          where: { email },
+          update: {
+            googleId: profile.id, // Link account if it existed via email/password
+            avatar: profile.photos?.[0].value, // Update avatar if provided
+            // Only update avatar if you want to overwrite existing ones
+          },
+          create: {
+            email,
+            name: profile.displayName || "Google User",
+            avatar: profile.photos?.[0].value,
+            provider: "google",
+            googleId: profile.id,
+          },
+        });
 
-        if (!user) {
-          user = await prisma.user.create({
-            data: {
-              email,
-              name: profile.displayName,
-              avatar: profile.photos?.[0].value,
-              provider: "google",
-              googleId: profile.id,
-            },
-          });
-        } else if (!user.googleId) {
-          user = await prisma.user.update({
-            where: { email },
-            data: {
-              googleId: profile.id,
-              avatar: user.avatar || profile.photos?.[0].value,
-            },
-          });
-        }
         return done(null, user);
       } catch (err) {
         return done(err, null);
@@ -87,37 +82,65 @@ passport.use(
       done: VerifyCallback,
     ) => {
       try {
+        // GitHub emails can be private/null. Fallback logic is essential.
         const email =
           profile.emails?.[0]?.value || `${profile.username}@github.com`;
+        const githubId = String(profile.id);
 
         let user = await prisma.user.findUnique({
+          where: { githubId },
+        });
+
+        if (user) {
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              email: email,
+              avatar: profile.photos?.[0]?.value,
+            },
+          });
+          return done(null, user);
+        }
+
+        user = await prisma.user.findUnique({
           where: { email },
         });
 
-        if (!user) {
-          // Create new
-          user = await prisma.user.create({
-            data: {
-              email,
-              name: profile.displayName || profile.username,
-              avatar: profile.photos?.[0]?.value || "",
-              provider: "github",
-              githubId: profile.id,
-            },
-          });
-        } else if (!user.githubId) {
-          //  Link Account if exists
+        if (user) {
           user = await prisma.user.update({
-            where: { email },
+            where: { id: user.id },
             data: {
-              githubId: profile.id,
+              githubId: githubId,
               avatar: user.avatar || profile.photos?.[0]?.value,
             },
           });
+          return done(null, user);
+        }
+
+        try {
+          user = await prisma.user.create({
+            data: {
+              email,
+              githubId,
+              name: profile.displayName || profile.username,
+              avatar: profile.photos?.[0]?.value || "",
+              provider: "github",
+            },
+          });
+        } catch (error: any) {
+          if (error.code === "P2002") {
+            user = await prisma.user.findUnique({
+              where: { githubId },
+            });
+            if (!user) throw error;
+          } else {
+            throw error;
+          }
         }
 
         return done(null, user);
       } catch (err) {
+        console.error("Passport GitHub Strategy Error:", err);
         return done(err);
       }
     },

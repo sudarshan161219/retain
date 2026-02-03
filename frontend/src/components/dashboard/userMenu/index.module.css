@@ -1,0 +1,189 @@
+.container {
+  position: relative;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  background-color: var(--card);
+  gap: 0.75rem;
+  padding-left: 0.75rem;
+  padding-right: 0.5rem;
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.pill:hover {
+  background-color: var(--blur-bg);
+  border-color: var(--ring);
+}
+
+.responsiveText {
+  text-align: right;
+  display: none;
+}
+
+.titlesm {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.metaText {
+  font-size: 10px;
+  color: var(--label);
+  font-weight: 500;
+  margin-top: 0.125rem;
+}
+
+.avatarBadge {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background);
+  color: var(--primary);
+  border-radius: 9999px;
+  outline: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  box-shadow: 0 1px 2px 0 var(--blur-bg);
+  overflow: hidden;
+}
+
+.avatarImage {
+  width: 100%;
+}
+
+/* DropDown */
+.menu {
+  position: absolute;
+  right: 0;
+  margin-top: 0.5rem;
+  width: 14rem;
+  background-color: var(--card);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 10px 10px -5px rgb(0 0 0 / 0.04);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+
+  z-index: 50;
+  transform-origin: top right;
+
+  animation: fadeZoomIn 100ms ease-out;
+}
+
+@keyframes fadeZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.sectionMobile {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sectionDesktop {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: none;
+}
+
+.name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.emailSmall {
+  font-size: 0.75rem;
+  color: var(--primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.label {
+  font-size: 0.75rem;
+  color: var(--label);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.email {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.buttonGroup {
+  padding: 0.25rem;
+}
+
+.logoutSection {
+  border-top: 1px solid var(--ring);
+  padding: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--primary);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: var(--primary);
+  color: var(--background);
+}
+
+.buttonDanger {
+  color: rgb(220 38 38);
+}
+
+.buttonDanger:hover {
+  background-color: var(--destructive);
+}
+/* DropDown */
+
+@media screen and (min-width: 640px) {
+  .responsiveText {
+    display: block;
+  }
+
+  .sectionMobile {
+    display: none;
+  }
+  .sectionDesktop {
+    display: block;
+  }
+}

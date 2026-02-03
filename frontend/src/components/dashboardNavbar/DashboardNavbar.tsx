@@ -1,85 +1,30 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
-  ExternalLink,
   Loader2,
-  Twitter,
-  Coffee,
-  LogOut,
   Sun,
   Moon,
-  Trash2,
-  Download,
+  LogOut,
+  User as UserIcon,
 } from "lucide-react";
-import { useModalStore } from "@/store/modalStore/useModalStore";
-import { useRetainerAdmin } from "@/hooks/client/useRetainerAdmin";
+
 import { useLogout } from "@/hooks/user/useLogout";
 import { useThemeStore } from "@/store/theme/useThemeStore";
+import { useUser } from "@/hooks/user/useUser";
 import styles from "./index.module.css";
 
 export const DashboardNavbar = () => {
-  const { adminToken } = useParams();
   const navigate = useNavigate();
+  const { data:user, isLoading: isUserLoading } = useUser();
   const { mutate: logout, isPending } = useLogout();
-  const { openModal } = useModalStore();
   const { theme, toggleLight, toggleDark } = useThemeStore();
 
-  // 1. Fetch Admin Data
-  const { client, isLoading, deleteProject } = useRetainerAdmin(adminToken);
-
-  // 2. Handle Logout
   const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
-
-  // 3. Handle Exit
-  const handleExitClick = () => {
-    openModal("WARNING", {
-      title: "Close Dashboard?",
-      description:
-        "This URL is your password. If you leave without saving it, you will lose access to this project and its data permanently.",
-      confirmText: "Delete",
-      variant: "neutral",
-      onConfirm: async () => {
-        handleLogout();
-      },
+    logout(undefined, {
+      onSuccess: () => navigate("/login"),
     });
   };
 
-  const handleLeaveClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    openModal("WARNING", {
-      title: "Leave Page?",
-      description:
-        "Leaving this page will reset your current session data. Ensure you have the link saved if you want to return.",
-      confirmText: "Leave & Reset",
-      variant: "neutral",
-      onConfirm: async () => {
-        handleLogout();
-        navigate("/");
-      },
-    });
-  };
-
-  const handleDeleteClick = () => {
-    openModal("WARNING", {
-      title: "Delete Project Permanently?",
-      description:
-        "This will wipe all data, logs, and access links immediately. This action cannot be undone.",
-      confirmText: "Delete Everything",
-      variant: "danger",
-      onConfirm: async () => {
-        deleteProject(undefined, {
-          onSuccess: () => {
-            handleLogout();
-          },
-        });
-      },
-    });
-  };
-
-  // Handle Theme Toggle
   const handleThemeToggle = () => {
     if (theme === "dark") {
       toggleLight();
@@ -91,100 +36,64 @@ export const DashboardNavbar = () => {
   return (
     <nav className={styles.nav}>
       <div className={styles.container}>
-        {/* LEFT: Branding */}
+        {/* --- LEFT: BRANDING --- */}
         <div className={styles.leftSection}>
-          <Link onClick={handleLeaveClick} to="/" className={styles.brandLink}>
+          <Link to="/dashboard" className={styles.brandLink}>
             <div className={styles.logoBox}>
-              <LayoutDashboard size={18} strokeWidth={2} />
+              <LayoutDashboard size={20} strokeWidth={2} />
             </div>
             <span className={styles.brandText}>Retain</span>
           </Link>
-
-          <span className={styles.divider}></span>
-
-          <div className={styles.clientName}>
-            {isLoading ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              client?.name || "Project Dashboard"
-            )}
-          </div>
         </div>
 
-        {/* RIGHT: Actions */}
+        {/* --- RIGHT: USER & ACTIONS --- */}
         <div className={styles.rightSection}>
-          {/* Desktop Only Links */}
-          <div className={styles.desktopLinks}>
-            <a
-              href="https://x.com/buildwithSud"
-              target="_blank"
-              rel="noreferrer"
-              className={styles.xButton}
-              title="Follow Updates"
-            >
-              <Twitter size={16} />
-            </a>
-            <a
-              href="https://buymeacoffee.com/sudarshanhosalli"
-              target="_blank"
-              rel="noreferrer"
-              className={styles.supportButton}
-            >
-              <Coffee size={14} />
-              <span>Support</span>
-            </a>
-          </div>
-
-          <div className={styles.verticalLine}></div>
-
-          {/* THEME TOGGLE (New) */}
+          {/* Theme Toggle */}
           <button
             onClick={handleThemeToggle}
             className={styles.iconButton}
             title={theme === "dark" ? "Switch to Light" : "Switch to Dark"}
           >
-            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          <button
-            onClick={handleDeleteClick}
-            className={styles.deleteButton}
-            title="Delete Project"
-          >
-            <Trash2 size={16} />
-          </button>
+          <div className={styles.dividerVertical}></div>
 
-          {/* PUBLIC VIEW LINK */}
-          {client?.slug && (
-            <a
-              href={`/${client.slug}`}
-              target="_blank"
-              rel="noreferrer"
-              title="View as Client"
-              className={styles.publicLinkButton}
-            >
-              <ExternalLink size={16} />
-              <span className={styles.brandText}>Client View</span>
-            </a>
-          )}
+          {/* User Profile Badge */}
+          {isUserLoading ? (
+            <Loader2 size={18} className="animate-spin text-gray-400" />
+          ) : user ? (
+            <div className={styles.userProfile}>
+              <div className={styles.avatarContainer}>
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className={styles.avatarImage}
+                  />
+                ) : (
+                  <div className={styles.avatarFallback}>
+                    <UserIcon size={16} />
+                  </div>
+                )}
+              </div>
 
-          <button
-            onClick={() => openModal("EXPORT_REPORT")}
-            className={styles.iconBtn}
-            title="Download Report"
-          >
-            <Download size={16} />
-          </button>
+              {/* Only Name shown now */}
+              <span className={styles.userName}>{user.name || "User"}</span>
+            </div>
+          ) : null}
 
-          {/* LOGOUT / EXIT */}
+          <div className={styles.dividerVertical}></div>
+
+          {/* Logout Button */}
           <button
-            onClick={handleExitClick}
-            title="Exit Dashboard"
-            className={styles.exitButton}
+            onClick={handleLogout}
+            className={styles.logoutButton}
             disabled={isPending}
+            title="Sign Out"
           >
             <LogOut size={16} />
-            <span className={styles.brandText}>Exit</span>
+            <span className={styles.hideMobile}>Sign Out</span>
           </button>
         </div>
       </div>

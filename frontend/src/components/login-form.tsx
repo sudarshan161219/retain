@@ -28,10 +28,7 @@ export function LoginForm({
 
   const handleGithubLogin = () => {
     const CLIENT_ID = "Ov23liwpeZdHplnGpOCQ";
-    // The URL your React app listens on (e.g., localhost:3000/auth/github/callback)
     const REDIRECT_URI = "http://localhost:5173/auth/github/callback";
-
-    // Redirect to GitHub's authorization page
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user:email`;
   };
 

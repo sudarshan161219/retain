@@ -6,7 +6,7 @@ import { Auth } from "@/pages/auth/Auth";
 import { ForgotPasswordRequest } from "@/pages/forgotPassword/forgotPasswordRequest/ForgotPasswordRequest";
 import { ResetPassword } from "@/pages/forgotPassword/ResetPassword/ResetPassword";
 import { GitHubCallback } from "@/pages/authCallback/gitHubCallback/GitHubCallback";
-import { AppLayout } from "@/layouts/AppLayout";
+import { PrivateRoutes } from "@/routes/PrivateRoutes";
 
 export const AppRoutes = () => {
   return (
@@ -16,8 +16,8 @@ export const AppRoutes = () => {
       <Route path="/forgot-password" element={<ForgotPasswordRequest />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/auth" element={<Auth />} />
-      <Route element={<AppLayout />}>
-        <Route path="/manage/:adminToken" element={<Dashboard />} />
+      <Route element={<PrivateRoutes />}>
+        <Route path="/dashboard/:id" element={<Dashboard />} />
       </Route>
       <Route path="/:slug" element={<ClientView />} />
     </Routes>

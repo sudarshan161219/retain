@@ -2,13 +2,11 @@ import type { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import { AppError } from "../../errors/AppError.js";
-// REMOVED: import redisClient from "../../config/redis.js";
 import type { JwtUserPayload } from "../../types/auth.types.js";
 import { asyncHandler } from "./asyncHandler.js";
 
 export const authenticate = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    // 1. Read from 'jwt' cookie (Matches your AuthController)
     const token = req.cookies.jwt;
 
     if (!token) {

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import api from "@/lib/api/api";
 import styles from "./index.module.css";
 
 export const GitHubCallback = () => {
@@ -11,26 +12,18 @@ export const GitHubCallback = () => {
 
     if (!code || processedRef.current) return;
 
-    processedRef.current = true; // Mark as processing
+    processedRef.current = true;
 
     const loginWithGitHub = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/auth/github", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) throw new Error(data.message || "Login failed");
-
-        localStorage.setItem("token", data.token);
-
-        navigate("/dashboard");
+        const { data } = await api.get(`/auth/github/callback?code=${code}`);
+        const { success, message, id } = data;
+        if (!success) {
+          throw new Error(message || "Login failed");
+        }
+        navigate(`/dashboard/${id}`);
       } catch (error) {
         console.error("GitHub Auth Error:", error);
-
         navigate("/login?error=github_failed");
       }
     };
