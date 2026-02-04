@@ -4,18 +4,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #f9fafb;
+  background-color: var(--background);
 }
 
 .text {
   margin-top: 1rem;
-  color: #6b7280;
+  color: var(--primary);
   font-size: 1rem;
   font-weight: 500;
 }
 
 .loader {
-  border: 4px solid #e5e7eb;
+  border: 4px solid var(--label);
   border-top: 4px solid #2563eb;
   border-radius: 50%;
   width: 40px;

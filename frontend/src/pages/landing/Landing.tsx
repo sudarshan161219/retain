@@ -34,7 +34,7 @@ export const Landing = () => {
 
   const handleCTA = () => {
     if (user) {
-      navigate("/dashboard");
+      navigate(`/dashboard/${user.id}`);
     } else {
       navigate("/auth");
     }

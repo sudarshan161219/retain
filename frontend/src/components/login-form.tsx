@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,20 +11,45 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore/useAuthStore";
 import { useNavigate } from "react-router-dom";
+import { EyeOffIcon } from "lucide-react";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
+  const [show, setShow] = useState(false);
   const { toggleAuthMode } = useAuthStore();
 
   const handleNavigation = () => {
     navigate("/forgot-password");
   };
 
+  const handleShowHide = () => {
+    setShow((prev) => !prev);
+  };
+
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/api/auth/google";
+    const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+
+    //Configuration Options
+    const options = {
+      redirect_uri: "http://localhost:5173/auth/google/callback",
+      client_id:
+        "674923430308-72mo7a6qvefsud1p9npro0juvsokioa8.apps.googleusercontent.com",
+      access_type: "offline",
+      response_type: "code",
+      prompt: "consent",
+      scope: [
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+      ].join(" "),
+    };
+
+    const qs = new URLSearchParams(options).toString();
+
+    window.location.href = `${rootUrl}?${qs}`;
   };
 
   const handleGithubLogin = () => {
@@ -42,12 +68,19 @@ export function LoginForm({
           </p>
         </div>
         <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <FieldLabel className="text-(--label) text-xs" htmlFor="email">
+            Email
+          </FieldLabel>
           <Input id="email" type="email" placeholder="m@example.com" required />
         </Field>
-        <Field>
-          <div className="flex items-center">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+        <Field className="max-w-sm">
+          <div className="flex items-center justify-between">
+            <FieldLabel
+              className="text-(--label) text-xs"
+              htmlFor="inline-end-input"
+            >
+              Password
+            </FieldLabel>
             <Button
               className="cursor-pointer"
               onClick={handleNavigation}
@@ -56,7 +89,21 @@ export function LoginForm({
               Forgot your password?
             </Button>
           </div>
-          <Input id="password" type="password" required />
+
+          <InputGroup>
+            <InputGroupInput
+              id="inline-end-input"
+              type={show ? "text" : "password"}
+              placeholder="Enter password"
+            />
+            <InputGroupAddon
+              className="cursor-pointer"
+              onClick={handleShowHide}
+              align="inline-end"
+            >
+              <EyeOffIcon />
+            </InputGroupAddon>
+          </InputGroup>
         </Field>
         <Field>
           <Button className="cursor-pointer" type="submit">
@@ -65,7 +112,12 @@ export function LoginForm({
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>
         <Field>
-          <Button className="cursor-pointer" variant="outline" type="button">
+          <Button
+            onClick={handleGoogleLogin}
+            className="cursor-pointer"
+            variant="outline"
+            type="button"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
                 d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
