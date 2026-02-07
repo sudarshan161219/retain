@@ -40,9 +40,14 @@ export class AuthService {
 
       const user = await prisma.user.create({
         data: { name: data.name, email: data.email, password: hashedPassword },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
       });
 
-      return { message: "User registered", user };
+      return user;
     } catch (error) {
       if (error instanceof AppError) {
         throw error;
@@ -93,20 +98,7 @@ export class AuthService {
         });
       }
 
-      const jti = uuidv4();
-      const token = jwt.sign({ id: user.id, jti }, process.env.JWT_SECRET!, {
-        expiresIn: "30d",
-      });
-
-      const { id, name, email } = user;
-      const { rememberMe } = data;
-
-      return {
-        token,
-        jti,
-        user: { id, name, email },
-        rememberMe,
-      };
+      return user;
     } catch (error) {
       if (error instanceof AppError) throw error;
 

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,22 +11,32 @@ import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { EyeOffIcon } from "lucide-react";
+import { useLogin } from "@/hooks/user/useLogin";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
+import { useLoginStore } from "@/store/authStore/useLoginStore";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
-  const [show, setShow] = useState(false);
+
+  const {
+    email,
+    password,
+    errors,
+    touched,
+    show,
+    setField,
+    toggleShow,
+    validate,
+  } = useLoginStore();
+
+  const { mutate: loginUser, isPending } = useLogin();
   const { toggleAuthMode } = useAuthStore();
 
   const handleNavigation = () => {
     navigate("/forgot-password");
-  };
-
-  const handleShowHide = () => {
-    setShow((prev) => !prev);
   };
 
   const handleGoogleLogin = () => {
@@ -58,8 +67,23 @@ export function LoginForm({
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user:email`;
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    loginUser({
+      email,
+      password,
+    });
+  };
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form
+      onSubmit={handleSubmit}
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Login to your account</h1>
@@ -71,7 +95,18 @@ export function LoginForm({
           <FieldLabel className="text-(--label) text-xs" htmlFor="email">
             Email
           </FieldLabel>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input
+            id="email"
+            type="email"
+            name="email"
+            placeholder="m@example.com"
+            value={email}
+            onChange={(e) => setField("email", e.target.value)}
+            required
+          />
+          {touched.email && errors.email && (
+            <p className="text-red-500 text-xs">{errors.email}</p>
+          )}
         </Field>
         <Field className="max-w-sm">
           <div className="flex items-center justify-between">
@@ -95,10 +130,13 @@ export function LoginForm({
               id="inline-end-input"
               type={show ? "text" : "password"}
               placeholder="Enter password"
+              name="password"
+              value={password}
+              onChange={(e) => setField("password", e.target.value)}
             />
             <InputGroupAddon
               className="cursor-pointer"
-              onClick={handleShowHide}
+              onClick={toggleShow}
               align="inline-end"
             >
               <EyeOffIcon />
@@ -106,8 +144,8 @@ export function LoginForm({
           </InputGroup>
         </Field>
         <Field>
-          <Button className="cursor-pointer" type="submit">
-            Login
+          <Button className="cursor-pointer" type="submit" disabled={isPending}>
+            {isPending ? "Please wait..." : "Login"}
           </Button>
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>
@@ -117,6 +155,7 @@ export function LoginForm({
             className="cursor-pointer"
             variant="outline"
             type="button"
+            disabled={isPending}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
@@ -131,6 +170,7 @@ export function LoginForm({
             className="cursor-pointer"
             variant="outline"
             type="button"
+            disabled={isPending}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
@@ -146,6 +186,7 @@ export function LoginForm({
               className="cursor-pointer"
               onClick={toggleAuthMode}
               variant="link"
+              disabled={isPending}
             >
               Sign up
             </Button>

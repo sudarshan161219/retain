@@ -6,7 +6,10 @@ export const Rule = ({
   children: React.ReactNode;
 }) => {
   return (
-    <li style={{ color: valid ? "green" : "red", fontSize: "0.8rem" }}>
+    <li
+      className={`${valid ? "text-green-500" : "text-red-500"}`}
+      style={{ fontSize: "0.8rem" }}
+    >
       {valid ? "✔" : "✖"} {children}
     </li>
   );

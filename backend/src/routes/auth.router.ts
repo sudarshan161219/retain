@@ -41,8 +41,8 @@ export class AuthRouter {
      */
     this.router.post(
       "/register",
-      registerValidator, // 1. Validation Rules
-      validate, // 2. Check for Errors
+      registerValidator,
+      validate,
       (req: Request, res: Response, next: NextFunction) =>
         this.authController.handleRegister(req, res, next),
     );
@@ -173,7 +173,6 @@ export class AuthRouter {
           { session: false },
           (err, user, info) => {
             if (err) {
-              // This logs the "redirect_uri_mismatch" if urls don't match
               console.error("GitHub Strategy Error:", err);
               return res
                 .status(500)
@@ -185,11 +184,12 @@ export class AuthRouter {
             }
 
             req.user = user;
-            next(); // Proceed to controller
+            next();
           },
         )(req, res, next);
       },
-      (req: Request, res: Response, next: NextFunction) => this.authController.oauthCallback(req, res, next),
+      (req: Request, res: Response, next: NextFunction) =>
+        this.authController.oauthCallback(req, res, next),
     );
   }
 }

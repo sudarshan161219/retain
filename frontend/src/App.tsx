@@ -4,7 +4,7 @@ export const App = () => {
   return (
     <>
       <AppRoutes />
-      <Toaster richColors />
+      <Toaster position="top-center" richColors />
     </>
   );
 };

@@ -16,8 +16,26 @@ export class AuthController {
    */
   async handleRegister(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.authService.register(req.body);
-      res.status(StatusCodes.CREATED).json(result);
+      const user = await this.authService.register(req.body);
+
+      const token = await this.authService.generateOAuthToken(user);
+
+      res.cookie("jwt", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.status(StatusCodes.CREATED).json({
+        success: true,
+        message: "User registered",
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+      });
     } catch (error) {
       next(error);
     }
@@ -28,21 +46,25 @@ export class AuthController {
    */
   async handleLogin(req: Request, res: Response, next: NextFunction) {
     try {
-      const { token, user, rememberMe } = await this.authService.login(
-        req.body,
-      );
+      const user = await this.authService.login(req.body);
+
+      const token = await this.authService.generateOAuthToken(user);
 
       res.cookie("jwt", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict", // Strict for login actions prevents CSRF
-        maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 2 * 60 * 60 * 1000,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.status(StatusCodes.OK).json({
-        user,
-
-        ...(process.env.NODE_ENV !== "production" && { token }),
+        success: true,
+        message: "User registered",
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
       });
     } catch (error) {
       next(error);

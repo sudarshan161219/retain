@@ -27,7 +27,6 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   // --- USER SETTINGS ---
-  // "My default Stripe/PayPal link"
   defaultRefillLink String?
 
   clients   Client[]

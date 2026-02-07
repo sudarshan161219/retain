@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EyeOffIcon } from "lucide-react";
@@ -14,18 +14,30 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore/useAuthStore";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
+import { useSignupStore } from "@/store/authStore/useSignupStore";
+import { useRegister } from "@/hooks/user/useRegister";
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const [show, setShow] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const {
+    name,
+    email,
+    password,
+    confirmPassword,
+    errors,
+    touched,
+    show,
+    setField,
+    toggleShow,
+    validate,
+  } = useSignupStore();
+  const { mutate: registerUser, isPending } = useRegister();
   const { toggleAuthMode } = useAuthStore();
 
   const handleShowHide = () => {
-    setShow((prev) => !prev);
+    toggleShow();
   };
 
   const rules = useMemo(() => {
@@ -65,8 +77,24 @@ export function SignupForm({
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user:email`;
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    registerUser({
+      name,
+      email,
+      password,
+    });
+  };
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form
+      onSubmit={handleSubmit}
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Create your account</h1>
@@ -78,13 +106,35 @@ export function SignupForm({
           <FieldLabel className="text-(--label) text-xs" htmlFor="name">
             Full Name
           </FieldLabel>
-          <Input id="name" type="text" placeholder="John Doe" required />
+          <Input
+            name="name"
+            id="name"
+            type="text"
+            placeholder="John Doe"
+            value={name}
+            onChange={(e) => setField("name", e.target.value)}
+            required
+          />
+          {touched.name && errors.name && (
+            <p className="text-red-500 text-xs">{errors.name}</p>
+          )}
         </Field>
         <Field>
           <FieldLabel className="text-(--label) text-xs" htmlFor="email">
             Email
           </FieldLabel>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input
+            name="email"
+            id="email"
+            type="email"
+            placeholder="m@example.com"
+            value={email}
+            onChange={(e) => setField("email", e.target.value)}
+            required
+          />
+          {touched.email && errors.email && (
+            <p className="text-red-500 text-xs">{errors.email}</p>
+          )}
         </Field>
         <Field>
           <FieldLabel className="text-(--label) text-xs" htmlFor="password">
@@ -92,11 +142,12 @@ export function SignupForm({
           </FieldLabel>
           <InputGroup>
             <InputGroupInput
+              name="password"
               id="password"
               type={show ? "text" : "password"}
               placeholder="Enter password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setField("password", e.target.value)}
             />
 
             <InputGroupAddon
@@ -107,9 +158,6 @@ export function SignupForm({
               <EyeOffIcon />
             </InputGroupAddon>
           </InputGroup>
-          <FieldDescription className="text-xs">
-            Must be at least 8 characters long.
-          </FieldDescription>
 
           <ul>
             <Rule valid={rules.minLength}>8+ characters</Rule>
@@ -128,11 +176,12 @@ export function SignupForm({
           </FieldLabel>
           <InputGroup>
             <InputGroupInput
+              name="confirmPassword"
               id="confirm-password"
               type={show ? "text" : "password"}
               placeholder="Enter password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => setField("confirmPassword", e.target.value)}
             />
 
             <InputGroupAddon
@@ -146,9 +195,9 @@ export function SignupForm({
 
           {confirmPassword && (
             <div
+              className={`${passwordsMatch ? "text-green-500" : "text-red-500"}`}
               style={{
-                color: passwordsMatch ? "green" : "red",
-                fontSize: "0.8rem",
+                fontSize: "0.78rem",
               }}
             >
               {passwordsMatch
@@ -159,11 +208,11 @@ export function SignupForm({
         </Field>
         <Field>
           <Button
-            disabled={!isValid || !passwordsMatch}
+            disabled={!isValid || !passwordsMatch || isPending}
             className="cursor-pointer"
             type="submit"
           >
-            Create Account
+            {isPending ? "Please Wait..." : "Create Account"}
           </Button>
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>
@@ -173,6 +222,7 @@ export function SignupForm({
             className="cursor-pointer"
             variant="outline"
             type="button"
+            disabled={isPending}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
@@ -185,6 +235,7 @@ export function SignupForm({
           <Button
             onClick={handleGithubLogin}
             className="cursor-pointer"
+            disabled={isPending}
             variant="outline"
             type="button"
           >
@@ -202,6 +253,7 @@ export function SignupForm({
               className="cursor-pointer"
               onClick={toggleAuthMode}
               variant="link"
+              disabled={isPending}
             >
               Sign in
             </Button>
