@@ -6,6 +6,7 @@ export type ModalType =
   | "EXPORT_REPORT"
   | "REFILL_BALANCE"
   | "AUTH"
+  | "CREATE_CLIENT"
   | null;
 
 interface ModalData {
@@ -19,7 +20,7 @@ interface ModalData {
 interface ModalState {
   isOpen: boolean;
   type: ModalType;
-  data: ModalData | null;
+  data?: ModalData | null;
 
   openModal: (type: ModalType, data?: ModalData) => void;
   closeModal: () => void;
@@ -31,6 +32,5 @@ export const useModalStore = create<ModalState>((set) => ({
   data: null,
 
   openModal: (type, data = undefined) => set({ isOpen: true, type, data }),
-
   closeModal: () => set({ isOpen: false, type: null, data: null }),
 }));

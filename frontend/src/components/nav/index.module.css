@@ -1,21 +1,18 @@
-/* Nav.module.css */
-
 .nav {
   position: sticky;
   top: 0;
   z-index: 40;
   width: 100%;
-  height: 4rem; /* 64px standard height */
+  height: 4rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 1.5rem;
-  background-color: var(--background); /* Or semi-transparent for blur */
+  background-color: var(--background);
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(8px);
 }
 
-/* --- Left Section (Context) --- */
 .leftSection {
   display: flex;
   align-items: center;
@@ -23,7 +20,7 @@
 }
 
 .menuBtn {
-  display: flex; /* Hidden on desktop by default? logic handled in JSX */
+  display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
@@ -32,7 +29,9 @@
   color: var(--muted-foreground);
   padding: 0.5rem;
   border-radius: var(--radius);
-  transition: color 0.2s, background-color 0.2s;
+  transition:
+    color 0.2s,
+    background-color 0.2s;
 }
 
 .menuBtn:hover {
@@ -60,23 +59,21 @@
   color: var(--foreground);
 }
 
-/* Logo fallback for non-editor pages */
 .logo {
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--primary); /* Or brand color */
+  color: var(--primary);
   text-decoration: none;
   letter-spacing: -0.025em;
 }
 
-/* --- Right Section (Actions) --- */
 .rightSection {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
 }
 
-/* Clear Button - Subtle by default, Red on hover */
 .clearBtn {
   display: flex;
   align-items: center;
@@ -86,15 +83,15 @@
   font-weight: 500;
   border-radius: var(--radius);
   background: transparent;
-  border: 1px solid transparent; /* Reserve space */
+  border: 1px solid transparent;
   color: var(--muted-foreground);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .clearBtn:hover {
-  background-color: #fef2f2; /* Light red bg */
-  color: #ef4444; /* Red text */
+  background-color: #fef2f2;
+  color: #ef4444;
   border-color: #fecaca;
 }
 
@@ -104,7 +101,6 @@
   border-color: #7f1d1d;
 }
 
-/* Download Button - Primary Action */
 .downloadBtn {
   display: flex;
   align-items: center;
@@ -126,7 +122,6 @@
   transform: translateY(-1px);
 }
 
-/* Mobile Tweaks */
 @media (max-width: 640px) {
   .nav {
     padding: 0 1rem;
@@ -140,7 +135,6 @@
     font-size: 0.9rem;
   }
 
-  /* Hide text on mobile for clear button if needed */
   .clearBtn span {
     display: none;
   }

@@ -15,7 +15,7 @@ import styles from "./index.module.css";
 
 export const DashboardNavbar = () => {
   const navigate = useNavigate();
-  const { data:user, isLoading: isUserLoading } = useUser();
+  const { data: user, isLoading: isUserLoading } = useUser();
   const { mutate: logout, isPending } = useLogout();
   const { theme, toggleLight, toggleDark } = useThemeStore();
 
@@ -36,7 +36,7 @@ export const DashboardNavbar = () => {
   return (
     <nav className={styles.nav}>
       <div className={styles.container}>
-        {/* --- LEFT: BRANDING --- */}
+        {/* --- Left: BRANDING --- */}
         <div className={styles.leftSection}>
           <Link to="/dashboard" className={styles.brandLink}>
             <div className={styles.logoBox}>
@@ -46,7 +46,7 @@ export const DashboardNavbar = () => {
           </Link>
         </div>
 
-        {/* --- RIGHT: USER & ACTIONS --- */}
+        {/* --- Right: USER & ACTIONS --- */}
         <div className={styles.rightSection}>
           {/* Theme Toggle */}
           <button
@@ -78,7 +78,6 @@ export const DashboardNavbar = () => {
                 )}
               </div>
 
-              {/* Only Name shown now */}
               <span className={styles.userName}>{user.name || "User"}</span>
             </div>
           ) : null}

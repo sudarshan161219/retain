@@ -3,10 +3,26 @@ import { ClientStatus } from "@prisma/client";
 
 export const createClientValidators = [
   body("name").trim().notEmpty().withMessage("Client name is required"),
+
   body("totalHours")
     .isFloat({ min: 0.1 })
     .withMessage("Total hours must be a positive number"),
-  body("refillLink").optional().isURL().withMessage("Must be a valid URL"),
+
+  body("hourlyRate")
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage("Hourly rate must be a positive number"),
+
+  body("currency")
+    .optional()
+    .isString()
+    .isLength({ min: 3, max: 3 })
+    .withMessage("Currency must be a 3-letter code (e.g. USD)"),
+
+  body("refillLink")
+    .optional({ checkFalsy: true })
+    .isURL()
+    .withMessage("Must be a valid URL"),
 ];
 
 export const updateDetailsValidators = [

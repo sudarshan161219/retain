@@ -61,8 +61,8 @@ export class ClientRouter {
      * POST /api/clients
      */
     this.router.post(
-      "/", // Mounted at /api/clients
-      authenticate, // 🔒
+      "/",
+      authenticate,
       createClientValidators,
       validate,
       (req: Request, res: Response, next: NextFunction) =>

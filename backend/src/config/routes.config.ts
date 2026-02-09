@@ -33,7 +33,7 @@ export function addRoutes(app: Application): Application {
 
     res.send(`<pre style="line-height: 1.0;">${sunArt}</pre>`);
   });
-  app.use("/api", ClientRouter.router);
+  app.use("/api/clients", ClientRouter.router);
   app.use("/api/auth", AuthRouter.router);
 
   return app;

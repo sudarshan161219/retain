@@ -44,33 +44,37 @@ enum ClientStatus {
 model Client {
   id          String   @id @default(uuid())
 
+  // --- OWNERSHIP ---
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // --- SECURITY & ACCESS ---
-  // The "Password". This UUID allows full read/write access.
-  adminToken  String   @unique @default(uuid())
-
-  // The "Public URL". This is used for the read-only client view.
-  // Example: retain.app/acme-corp
+  // --- PUBLIC ACCESS ---
+  // The public URL slug (e.g. retain.app/acme-corp)
   slug        String   @unique
 
-  // --- RETAINER DATA ---
+  // --- CLIENT DETAILS ---
   name        String
+  status      ClientStatus @default(ACTIVE)
   
-  // Using Decimal is critical for billing (prevents 0.1 + 0.2 = 0.30004 errors)
-  // Precision: 10 digits total, 2 decimal places (e.g. 99999999.99)
-  currentBalance  Decimal  @default(0.00) @db.Decimal(10, 2)
-  
-  // Optional: A link to Stripe, PayPal, or an invoice for when they run out
+  // Payment Link (Stripe/PayPal/Invoice)
   refillLink  String?
 
-  status      ClientStatus @default(ACTIVE)
+  // --- FINANCIALS ---
+  // The "Contract Size" (e.g., 20 hours). Used to calculate revenue potential.
+  totalHours  Decimal  @default(0.00) @db.Decimal(10, 2)
 
+  // The "Live Balance". Updated automatically when logs are added.
+  currentBalance  Decimal  @default(0.00) @db.Decimal(10, 2)
+
+  // Revenue Calculation: (hourlyRate * totalHours)
+  hourlyRate  Decimal  @default(0.00) @db.Decimal(10, 2) 
+  currency    String   @default("USD")
+
+  // --- TIMESTAMPS ---
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relation: One client has many work logs
+  // --- RELATIONS ---
   logs        WorkLog[]
 }
 
@@ -90,7 +94,7 @@ model WorkLog {
   // When the work was actually done (allows back-dating logs)
   date        DateTime @default(now())
 
-// Add the type field (Default to WORK so existing logs don't break)
+  //  (Default to WORK so existing logs don't break)
   type        LogType  @default(WORK)
 
   // Relation fields

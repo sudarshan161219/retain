@@ -11,13 +11,17 @@ import { nanoid } from "nanoid";
 export class ClientService {
   /**
    * CREATE CLIENT (RETAINER)
-   * Generates the Admin Token (Access Key) and Obscured Slug (Public Link)
    */
   async createClient(
     userId: string,
-    data: { name: string; totalHours: number; refillLink?: string },
+    data: {
+      name: string;
+      totalHours: number;
+      hourlyRate?: number;
+      currency?: string;
+      refillLink?: string;
+    },
   ) {
-    //  Generate public slug (e.g. "acme-corp-x9z2k")
     const baseSlug = slugify.default(data.name, { lower: true, strict: true });
     const slug = `${baseSlug}-${nanoid(5)}`;
 
@@ -43,7 +47,10 @@ export class ClientService {
         userId,
         name: data.name,
         slug,
+        totalHours: data.totalHours,
         currentBalance: data.totalHours,
+        hourlyRate: data.hourlyRate || 0,
+        currency: data.currency || "USD",
         refillLink: finalRefillLink,
         status: ClientStatus.ACTIVE,
       },
@@ -85,7 +92,7 @@ export class ClientService {
   /**
    * GET CLIENT (PUBLIC VIEW)
    * Returns RESTRICTED data.
-   * CRITICAL: Explicitly selects fields to hide 'adminToken'.
+   *
    */
   async getClientBySlug(slug: string) {
     const client = await prisma.client.findUnique({
@@ -94,6 +101,8 @@ export class ClientService {
         name: true,
         slug: true,
         currentBalance: true,
+        totalHours: true,
+        hourlyRate: true,
         refillLink: true,
         status: true,
         updatedAt: true,
@@ -192,9 +201,10 @@ export class ClientService {
    * ADD REFILL LOG
    */
   async refillClient(
-    userId: string, // Authenticated User
-    clientId: string, // Target Client ID
+    userId: string,
+    clientId: string,
     hours: number,
+    newRate?: number,
     createLog: boolean = true,
   ) {
     // Use a Transaction to ensure Authorization + Update + Log happen atomically
@@ -215,22 +225,36 @@ export class ClientService {
         });
       }
 
+      const updateData: any = {
+        currentBalance: { increment: hours },
+        totalHours: { increment: hours },
+      };
+
+      if (newRate !== undefined && client.hourlyRate.toNumber() !== newRate) {
+        updateData.hourlyRate = newRate;
+      }
+
       // 2. Update Balance (The "Bank Deposit")
       const updatedClient = await tx.client.update({
         where: { id: clientId },
-        data: {
-          currentBalance: { increment: hours }, // Atomic increment
-        },
+        data: updateData,
       });
 
       let newLog = null;
+
+      let description = `⚡ Refill: Added ${hours} hours`;
+      const currentRate = client.hourlyRate.toNumber();
+      
+      if (newRate && newRate !== currentRate) {
+        description += ` (Rate updated to $${newRate}/hr)`;
+      }
 
       // 3. Create Audit Log (The "Receipt")
       if (createLog) {
         newLog = await tx.workLog.create({
           data: {
             clientId: client.id,
-            description: `⚡ Refill: Added ${hours} hours`,
+            description: description,
             hours: hours,
             type: "REFILL",
             date: new Date(),
@@ -322,7 +346,6 @@ export class ClientService {
       where: { id: clientId },
       data: {
         ...(data.name && { name: data.name }),
-        // Allow clearing the link by passing an empty string or explicitly handling undefined if needed
         ...(data.refillLink !== undefined && { refillLink: data.refillLink }),
       },
     });

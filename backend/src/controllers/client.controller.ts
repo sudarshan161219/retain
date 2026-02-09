@@ -37,7 +37,7 @@ export class ClientController {
         throw new AppError({ message: "Unauthorized", statusCode: 401 });
       const userId = req.user.id;
 
-      const { name, totalHours, refillLink } = req.body;
+      const { name, totalHours, refillLink, hourlyRate, currency } = req.body;
 
       if (!name || typeof name !== "string") {
         throw new AppError({
@@ -59,7 +59,9 @@ export class ClientController {
 
       const client = await this.clientService.createClient(userId, {
         name,
-        totalHours: Number(totalHours), // Mapped to currentBalance in Service
+        totalHours: Number(totalHours),
+        hourlyRate,
+        currency,
         refillLink,
       });
 
@@ -179,7 +181,7 @@ export class ClientController {
         userId,
         clientId,
         Number(hours),
-        !!createLog,
+        createLog,
       );
 
       this.emitUpdate(client.slug, "REFILL", {

@@ -3,6 +3,7 @@ import { Box, Menu } from "lucide-react";
 import { useSidebarStore } from "@/store/sidebarStore/useSidebarStore";
 import { UserMenu } from "@/components/dashboard/userMenu/UserMenu";
 import { NavLink } from "react-router-dom";
+import { MainHeading } from "@/components/mainHeading/MainHeading";
 import styles from "./index.module.css";
 export const Nav = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -16,9 +17,9 @@ export const Nav = () => {
 
   return (
     <nav className={styles.nav}>
-      {/* --- LEFT: Context --- */}
+      {/* --- Left: Context --- */}
       <div className={styles.leftSection}>
-        {isMobile && (
+        {isMobile ? (
           <button
             onClick={toggleSidebar}
             className={styles.menuBtn}
@@ -26,10 +27,12 @@ export const Nav = () => {
           >
             <Menu size={20} />
           </button>
+        ) : (
+          <MainHeading />
         )}
       </div>
 
-      {/* --- CENTER: Name and logo (mobile) --- */}
+      {/* --- Center: Name and logo (mobile) --- */}
       {isMobile && (
         <NavLink
           to="/dashboard"
@@ -40,7 +43,7 @@ export const Nav = () => {
         </NavLink>
       )}
 
-      {/* --- RIGHT: Actions --- */}
+      {/* --- Right: Actions --- */}
       <div className={styles.rightSection}>
         <UserMenu />
       </div>
