@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.input {
+  position: relative;
+  width: 70%;
+  flex: 1;
+}
+.selectTrigger {
+  width: 30%;
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .container {
+    width: 500px;
+  }
+}

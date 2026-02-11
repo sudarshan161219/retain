@@ -11,6 +11,8 @@ export const CreateClientModal = () => {
   const {
     name,
     setName,
+    email,
+    setEmail,
     hours,
     setHours,
     rate,
@@ -19,19 +21,20 @@ export const CreateClientModal = () => {
     setCurrency,
     refillLink,
     setRefillLink,
-    // reset,
   } = useCreateClientStore();
 
   const totalValue = Number(hours || 0) * Number(rate || 0);
 
   const handleCreate = () => {
-    if (!name || !hours) throw new Error("Name and Hours are required");
+    if (!name || !email || !hours)
+      throw new Error("Name, Email and Hours are required");
 
     const totalHours = Number(hours);
     const hourlyRate = Number(rate);
 
     mutate({
       name,
+      email,
       totalHours,
       hourlyRate,
       currency,
@@ -55,18 +58,34 @@ export const CreateClientModal = () => {
         {/* BODY */}
         <div className={styles.body}>
           {/* Client Name */}
-          <div className={styles.formGroup}>
-            <label htmlFor="name" className={styles.label}>
-              Client / Company Name
-            </label>
-            <input
-              id="name"
-              className={styles.input}
-              placeholder="e.g. Acme Corp"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoFocus
-            />
+
+          <div className={styles.row}>
+            <div className={`${styles.formGroup} ${styles.col}`}>
+              <label htmlFor="name" className={styles.label}>
+                Client / Company Name
+              </label>
+              <input
+                id="name"
+                className={styles.input}
+                placeholder="e.g. Acme Corp"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className={`${styles.formGroup} ${styles.col}`}>
+              <label htmlFor="email" className={styles.label}>
+                Client Email
+              </label>
+              <input
+                id="email"
+                className={styles.input}
+                placeholder="e.g. client@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoFocus
+              />
+            </div>
           </div>
 
           {/* Hours & Rate Row */}

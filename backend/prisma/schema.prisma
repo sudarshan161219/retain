@@ -54,6 +54,7 @@ model Client {
 
   // --- CLIENT DETAILS ---
   name        String
+  email       String   
   status      ClientStatus @default(ACTIVE)
   
   // Payment Link (Stripe/PayPal/Invoice)
@@ -64,7 +65,7 @@ model Client {
   totalHours  Decimal  @default(0.00) @db.Decimal(10, 2)
 
   // The "Live Balance". Updated automatically when logs are added.
-  currentBalance  Decimal  @default(0.00) @db.Decimal(10, 2)
+  hoursLogged  Decimal  @default(0.00) @db.Decimal(10, 2)
 
   // Revenue Calculation: (hourlyRate * totalHours)
   hourlyRate  Decimal  @default(0.00) @db.Decimal(10, 2) 
@@ -74,8 +75,12 @@ model Client {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  lastLogAt   DateTime?
+
   // --- RELATIONS ---
   logs        WorkLog[]
+
+  @@unique([userId, email])
 }
 
 

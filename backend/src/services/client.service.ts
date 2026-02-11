@@ -2,7 +2,8 @@ import { injectable } from "inversify";
 import { prisma } from "../utils/prismaClient.js";
 import { AppError } from "../errors/AppError.js";
 import { StatusCodes } from "http-status-codes";
-import { ClientStatus } from "@prisma/client";
+import { Prisma, ClientStatus } from "@prisma/client";
+import type { GetClientsParams } from "../types/client.types.js";
 import ExcelJS from "exceljs";
 import slugify from "slugify";
 import { nanoid } from "nanoid";
@@ -16,6 +17,7 @@ export class ClientService {
     userId: string,
     data: {
       name: string;
+      email: string;
       totalHours: number;
       hourlyRate?: number;
       currency?: string;
@@ -39,16 +41,16 @@ export class ClientService {
       });
     }
 
-    // 2. logic: Use provided link OR fall back to user default
     const finalRefillLink = data.refillLink || user.defaultRefillLink;
 
     const client = await prisma.client.create({
       data: {
         userId,
         name: data.name,
+        email: data.email,
         slug,
         totalHours: data.totalHours,
-        currentBalance: data.totalHours,
+        hoursLogged: 0,
         hourlyRate: data.hourlyRate || 0,
         currency: data.currency || "USD",
         refillLink: finalRefillLink,
@@ -57,6 +59,56 @@ export class ClientService {
     });
 
     return client;
+  }
+
+  async getClients({
+    userId,
+    search,
+    status,
+    page = 1,
+    limit = 10,
+  }: GetClientsParams) {
+    const defaultPage = Math.max(1, page);
+    const defaultLimit = Math.max(100, limit);
+    const skip = (defaultPage - 1) * defaultLimit;
+
+    const isValidStatus =
+      status && Object.values(ClientStatus).includes(search as ClientStatus);
+
+    const whereClause: Prisma.ClientWhereInput = {
+      userId: userId,
+
+      ...(search?.trim() && {
+        OR: [
+          { name: { contains: search.trim(), mode: "insensitive" } },
+          { email: { contains: search.trim(), mode: "insensitive" } },
+        ],
+      }),
+
+      ...(isValidStatus && { status: status as ClientStatus }),
+    };
+
+    const [client, total] = await prisma.$transaction([
+      prisma.client.findMany({
+        where: whereClause,
+        skip: skip,
+        take: limit,
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+      prisma.client.count({ where: whereClause }),
+    ]);
+
+    return {
+      data: client,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   /**
@@ -132,8 +184,8 @@ export class ClientService {
    * ADD WORK LOG
    */
   async addWorkLog(
-    userId: string, // admin"
-    clientId: string, // client"
+    userId: string,
+    clientId: string,
     data: {
       description: string;
       hours: number;
@@ -187,7 +239,7 @@ export class ClientService {
       await tx.client.update({
         where: { id: clientId },
         data: {
-          currentBalance: {
+          hoursLogged: {
             [operation]: hours,
           },
         },
@@ -244,7 +296,7 @@ export class ClientService {
 
       let description = `⚡ Refill: Added ${hours} hours`;
       const currentRate = client.hourlyRate.toNumber();
-      
+
       if (newRate && newRate !== currentRate) {
         description += ` (Rate updated to $${newRate}/hr)`;
       }
@@ -302,7 +354,7 @@ export class ClientService {
       await tx.client.update({
         where: { id: log.clientId },
         data: {
-          currentBalance: {
+          hoursLogged: {
             [operation]: log.hours,
           },
         },
@@ -469,7 +521,10 @@ export class ClientService {
     worksheet.addRow({}); //* Empty row
 
     //* Calculate Remaining Balance (Current State)
-    const currentBalance = client.currentBalance.toNumber();
+    const totalHours = client.totalHours.toNumber();
+    const loggedHours = client.hoursLogged.toNumber();
+
+    const currentBalance = totalHours - loggedHours;
 
     const balanceRow = worksheet.addRow({
       description: "CURRENT REMAINING BALANCE",
@@ -477,7 +532,7 @@ export class ClientService {
     });
 
     balanceRow.font = { bold: true, size: 12 };
-    balanceRow.getCell("hours").numFmt = "0.00"; //* Format as number
+    balanceRow.getCell("hours").numFmt = "0.00";
 
     //* Generate Filename
     const safeName = client.name.replace(/[^a-z0-9]/gi, "_").toLowerCase();

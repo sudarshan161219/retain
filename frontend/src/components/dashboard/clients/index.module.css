@@ -1,0 +1,270 @@
+.clientsCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.clientsLoading {
+  padding: 3rem;
+  text-align: center;
+  color: var(--label);
+  animation: pulse 1.5s infinite;
+}
+
+.clientsEmpty {
+  padding: 3rem;
+  text-align: center;
+}
+
+.clientsEmptyText {
+  color: (--label);
+  font-weight: 500;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* =========================
+   TABLE (DESKTOP)
+========================= */
+
+.clientstableWrapper {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .clientstableWrapper {
+    display: block;
+  }
+}
+
+.clientsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.clientsTable th {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--label);
+}
+
+.clientsTable td {
+  padding: 1rem 1.5rem;
+  vertical-align: middle;
+}
+
+.clientsTable tbody tr {
+  border-top: 1px solid var(--ring);
+  transition: background 0.2s;
+}
+
+.clientsTable tbody tr:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.clientsUsageCol {
+  width: 33%;
+}
+
+.clientsUpdated {
+  font-size: 0.75rem;
+  color: var(--label);
+}
+
+.clientsActions {
+  text-align: right;
+}
+
+/* =========================
+   CLIENT CELL
+========================= */
+
+.clientCell {
+  display: flex;
+  align-items: center;
+}
+
+.clientAvatar {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-right: 0.75rem;
+}
+
+.clientName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+/* =========================
+   MOBILE CARDS
+========================= */
+
+.clientsMobile {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .clientsMobile {
+    display: none;
+  }
+}
+
+.clientsMobileCard {
+  padding: 1rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.mobileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.mobileclientInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobileAvatar {
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #dbeafe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.mobileName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.mobileUpdated {
+  font-size: 0.75rem;
+  color: var(--label);
+  margin-top: 0.25rem;
+}
+
+.mobileProgressBox {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--ring);
+}
+
+.mobileprogressheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.mobileprogresslabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--label);
+}
+
+/* =========================
+   PAGINATION
+========================= */
+
+.clientsPagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--ring);
+}
+
+.paginationInfo {
+  font-size: 0.75rem;
+  color: var(--label);
+}
+
+.desktopOnly {
+  display: none;
+}
+
+.mobileOnly {
+  display: block;
+}
+
+@media (min-width: 640px) {
+  .desktopOnly {
+    display: block;
+  }
+  .mobileOnly {
+    display: none;
+  }
+}
+
+.paginationButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.paginationBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 2rem;
+  padding: 0;
+  border: 1px solid var(--ring);
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+.paginationBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================
+   ICON BUTTON
+========================= */
+
+.iconButton {
+  color: var(--label);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.iconButton:hover {
+  color: #4b5563;
+}

@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 interface CreateClientState {
   name: string;
+  email: string;
   hours: number | "";
   rate: number | "";
   currency: string;
@@ -9,6 +10,7 @@ interface CreateClientState {
 
   // Actions
   setName: (name: string) => void;
+  setEmail: (email: string) => void;
   setHours: (hours: number | "") => void;
   setRate: (rate: number | "") => void;
   setCurrency: (currency: string) => void;
@@ -18,12 +20,14 @@ interface CreateClientState {
 
 export const useCreateClientStore = create<CreateClientState>((set) => ({
   name: "",
+  email: "",
   hours: "",
   rate: "",
   currency: "USD",
   refillLink: "",
 
   setName: (name) => set({ name }),
+  setEmail: (email) => set({ email }),
   setHours: (hours) => set({ hours }),
   setRate: (rate) => set({ rate }),
   setCurrency: (currency) => set({ currency }),

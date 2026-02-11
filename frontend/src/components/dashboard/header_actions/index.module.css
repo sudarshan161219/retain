@@ -1,0 +1,32 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.headertitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.headersubtitle {
+  font-size: 0.875rem;
+  color: var(--label);
+  margin: 0.25rem 0 0 0;
+}
+
+.buttonicon {
+  display: inline-flex;
+  margin-right: 0.5rem;
+}

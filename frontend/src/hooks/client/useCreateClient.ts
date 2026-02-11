@@ -7,6 +7,7 @@ import { useModalStore } from "@/store/modalStore/useModalStore";
 
 type Data = {
   name: string;
+  email: string;
   totalHours: number | "";
   hourlyRate: number | "";
   currency: string;
@@ -25,7 +26,6 @@ export const useCreateClient = () => {
   return useMutation({
     mutationFn: async (data: Data) => {
       const res = await api.post("/clients", data);
-      console.log(res.data);
       return res.data;
     },
     onSuccess: (data) => {

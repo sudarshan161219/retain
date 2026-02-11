@@ -40,7 +40,7 @@ export class ClientRouter {
     // ==========================================
 
     /**
-     * 1. PUBLIC VIEW (Client Read-Only)
+     *  PUBLIC VIEW (Client Read-Only)
      * GET /api/clients/public/:slug
      * (Moved to /public/ namespace to avoid collision with ID routes)
      */
@@ -57,7 +57,7 @@ export class ClientRouter {
     // ==========================================
 
     /**
-     * 2. CREATE CLIENT
+     *  CREATE CLIENT
      * POST /api/clients
      */
     this.router.post(
@@ -70,12 +70,24 @@ export class ClientRouter {
     );
 
     /**
+     *  Get All Clients
+     * POST /api/clients
+     */
+    this.router.get(
+      "/",
+      authenticate,
+      validate,
+      (req: Request, res: Response, next: NextFunction) =>
+        this.clientController.get(req, res, next),
+    );
+
+    /**
      * 3. GET ONE CLIENT (Admin Dashboard)
      * GET /api/clients/:id
      */
     this.router.get(
       "/:id",
-      authenticate, // 🔒
+      authenticate,
       idParamValidator,
       validate,
       (req: Request, res: Response, next: NextFunction) =>

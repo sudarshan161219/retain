@@ -1,11 +1,13 @@
 import type { Request, Response, NextFunction } from "express";
 import { injectable, inject } from "inversify";
+import { z } from "zod";
 import { TYPES } from "../types/types.js";
 import { ClientService } from "../services/client.service.js";
 import { StatusCodes } from "http-status-codes";
 import { AppError } from "../errors/AppError.js";
 import { getIO } from "../socket/index.js";
 import { ClientStatus } from "@prisma/client";
+import { getClientsQuerySchema } from "../validators/clientQuery.validator.js";
 
 @injectable()
 export class ClientController {
@@ -37,7 +39,8 @@ export class ClientController {
         throw new AppError({ message: "Unauthorized", statusCode: 401 });
       const userId = req.user.id;
 
-      const { name, totalHours, refillLink, hourlyRate, currency } = req.body;
+      const { name, email, totalHours, refillLink, hourlyRate, currency } =
+        req.body;
 
       if (!name || typeof name !== "string") {
         throw new AppError({
@@ -59,6 +62,7 @@ export class ClientController {
 
       const client = await this.clientService.createClient(userId, {
         name,
+        email,
         totalHours: Number(totalHours),
         hourlyRate,
         currency,
@@ -70,6 +74,45 @@ export class ClientController {
         data: client,
       });
     } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Get All Clients
+   * GET /api/clients
+   */
+  async get(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.user)
+        throw new AppError({ message: "Unauthorized", statusCode: 401 });
+
+      const query = getClientsQuerySchema.parse(req.query);
+
+      const userId = req.user.id;
+
+      const client = await this.clientService.getClients({
+        userId: userId,
+        search: query.search,
+        status: query.status,
+        page: query.page,
+        limit: query.limit,
+      });
+
+      return res.status(StatusCodes.OK).json({
+        status: "success",
+        data: client.data,
+        meta: client.meta,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return next(
+          new AppError({
+            message: "Invalid query parameters",
+            statusCode: 400,
+          }),
+        );
+      }
       next(error);
     }
   }
@@ -88,7 +131,10 @@ export class ClientController {
 
       const client = await this.clientService.getClientById(userId, clientId);
 
-      res.json(client);
+      return res.status(StatusCodes.OK).json({
+        role: "CLIENT",
+        data: client,
+      });
     } catch (error) {
       next(error);
     }
