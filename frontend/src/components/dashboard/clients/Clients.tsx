@@ -194,9 +194,34 @@ export const Clients = () => {
                     </div>
                   </div>
 
-                  <button className="iconButton">
-                    <MoreHorizontal size={20} />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        className="cursor-pointer"
+                        variant="outline"
+                        size="sm"
+                      >
+                        <MoreHorizontal size={18} />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <LinkIcon size={14} /> Copy Public Link
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => editBtnHandler(client)}
+                      >
+                        <Edit2 size={14} /> Edit Client
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <PauseCircle size={14} /> Pause Retainer
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <Archive size={14} /> Archive
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 <div className={styles.mobileProgressBox}>
