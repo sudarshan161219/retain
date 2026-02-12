@@ -7,15 +7,15 @@ export type Client = {
   slug: string;
   name: string;
   email: string;
-  status: "ACTIVE" | "INACTIVE" | "SUSPENDED"; // adjust if you have more statuses
+  status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
   refillLink: string | null;
   lastLogAt: string | null;
-  totalHours: string; // string because API returns it as string
-  hoursLogged: string; // string because API returns it as string
-  hourlyRate: string; // string because API returns it as string
-  currency: string; // consider union if fixed currencies
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
+  totalHours: string;
+  hoursLogged: string;
+  hourlyRate: string;
+  currency: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export const clientKeys = {

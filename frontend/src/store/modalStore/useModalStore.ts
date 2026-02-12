@@ -7,6 +7,7 @@ export type ModalType =
   | "REFILL_BALANCE"
   | "AUTH"
   | "CREATE_CLIENT"
+  | "EDIT_CLIENT"
   | null;
 
 interface ModalData {

@@ -1,6 +1,6 @@
 .header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
@@ -28,5 +28,4 @@
 
 .buttonicon {
   display: inline-flex;
-  margin-right: 0.5rem;
 }

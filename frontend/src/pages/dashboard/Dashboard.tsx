@@ -1,13 +1,12 @@
 import { CreateClientModal } from "@/components/modal/createClientModal/CreateClientModal";
+import { EditClientModal } from "@/components/modal/editClientModal/EditClientModal";
 import { Clients } from "@/components/dashboard/clients/Clients";
 import { Header } from "@/components/dashboard/header_actions/Header";
 import { SearchBar } from "@/components/dashboard/searchBar/SearchBar";
-
-// --- SUB-COMPONENTS ---
-
+import styles from "./index.module.css";
 export const Dashboard = () => {
   return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+    <div className={styles.container}>
       {/* 1. HEADER & ACTIONS */}
       <Header />
 
@@ -18,6 +17,7 @@ export const Dashboard = () => {
       <Clients />
 
       <CreateClientModal />
+      <EditClientModal />
     </div>
   );
 };

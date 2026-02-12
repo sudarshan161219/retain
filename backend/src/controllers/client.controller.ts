@@ -231,14 +231,14 @@ export class ClientController {
       );
 
       this.emitUpdate(client.slug, "REFILL", {
-        currentBalance: client.currentBalance,
+        hoursLogged: client.hoursLogged,
         log: log,
       });
 
       return res.status(StatusCodes.OK).json({
         message: "Balance refilled successfully",
         data: {
-          currentBalance: client.currentBalance,
+          hoursLogged: client.hoursLogged,
           log,
         },
       });
@@ -275,22 +275,33 @@ export class ClientController {
    */
   async updateDetails(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!req.user)
-        throw new AppError({ message: "Unauthorized", statusCode: 401 });
+      if (!req.user) {
+        throw new AppError({
+          message: "Unauthorized",
+          statusCode: StatusCodes.UNAUTHORIZED,
+        });
+      }
+
       const userId = req.user.id;
       const { id: clientId } = req.params;
-
-      const { name, refillLink } = req.body;
+      const { name, email, totalHours, hourlyRate, currency, refillLink } =
+        req.body;
 
       const client = await this.clientService.updateDetails(userId, clientId, {
         name,
-        refillLink,
+        email,
+        totalHours: totalHours !== "" ? Number(totalHours) : undefined,
+        rate: hourlyRate !== "" ? Number(hourlyRate) : undefined,
+        currency,
+        refillLink: refillLink || null,
       });
 
+      // Real-time updates & Response
       this.emitUpdate(client.slug, "DETAILS_UPDATE", client);
 
-      res.status(200).json({
+      return res.status(StatusCodes.OK).json({
         success: true,
+        message: "Client updated successfully",
         data: client,
       });
     } catch (error) {

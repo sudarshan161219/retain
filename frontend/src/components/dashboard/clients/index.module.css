@@ -41,12 +41,6 @@
   display: none;
 }
 
-@media (min-width: 768px) {
-  .clientstableWrapper {
-    display: block;
-  }
-}
-
 .clientsTable {
   width: 100%;
   border-collapse: collapse;
@@ -54,7 +48,6 @@
 
 .clientsTable th {
   padding: 0.75rem 1.5rem;
-  text-align: left;
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -79,11 +72,22 @@
 
 .clientsUsageCol {
   width: 33%;
+  text-align: left;
 }
 
 .clientsUpdated {
   font-size: 0.75rem;
   color: var(--label);
+}
+
+.client,
+.status,
+.updated {
+  text-align: left;
+}
+
+.actions {
+  text-align: right;
 }
 
 .clientsActions {
@@ -103,8 +107,6 @@
   height: 2rem;
   width: 2rem;
   border-radius: 50%;
-  background: #dbeafe;
-  color: #2563eb;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -222,15 +224,6 @@
   display: block;
 }
 
-@media (min-width: 640px) {
-  .desktopOnly {
-    display: block;
-  }
-  .mobileOnly {
-    display: none;
-  }
-}
-
 .paginationButtons {
   display: flex;
   gap: 0.5rem;
@@ -267,4 +260,19 @@
 
 .iconButton:hover {
   color: #4b5563;
+}
+
+@media (min-width: 640px) {
+  .desktopOnly {
+    display: block;
+  }
+  .mobileOnly {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .clientstableWrapper {
+    display: block;
+  }
 }

@@ -376,31 +376,40 @@ export class ClientService {
   async updateDetails(
     userId: string,
     clientId: string,
-    data: { name?: string; refillLink?: string; totalHours?: number },
+    data: {
+      name?: string;
+      email?: string;
+      totalHours?: number;
+      rate?: number;
+      currency?: string;
+      refillLink?: string | null;
+    },
   ) {
-    //* Verify Ownership (Security)
-    const client = await prisma.client.findFirst({
-      where: {
-        id: clientId,
-        userId: userId,
-      },
-    });
+    try {
+      return await prisma.client.update({
+        where: {
+          id: clientId,
+          userId: userId,
+        },
 
-    if (!client) {
-      throw new AppError({
-        message: "Client not found or unauthorized",
-        statusCode: StatusCodes.NOT_FOUND,
+        data: {
+          name: data.name,
+          email: data.email,
+          totalHours: data.totalHours,
+          hourlyRate: data.rate,
+          currency: data.currency,
+          refillLink: data.refillLink,
+        },
       });
+    } catch (error: any) {
+      if (error.code === "P2025") {
+        throw new AppError({
+          message: "Client not found or unauthorized",
+          statusCode: StatusCodes.NOT_FOUND,
+        });
+      }
+      throw error;
     }
-
-    //* Update Details
-    return await prisma.client.update({
-      where: { id: clientId },
-      data: {
-        ...(data.name && { name: data.name }),
-        ...(data.refillLink !== undefined && { refillLink: data.refillLink }),
-      },
-    });
   }
 
   /**

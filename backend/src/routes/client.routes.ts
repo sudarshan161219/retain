@@ -100,7 +100,7 @@ export class ClientRouter {
      */
     this.router.patch(
       "/:id",
-      authenticate, // 🔒
+      authenticate,
       updateDetailsValidators,
       validate,
       (req: Request, res: Response, next: NextFunction) =>

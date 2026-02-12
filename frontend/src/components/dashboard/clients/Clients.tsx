@@ -2,14 +2,44 @@ import { useMemo, useState } from "react";
 import { useGetAllClients } from "@/hooks/client/useGetAllClients";
 import styles from "./index.module.css";
 import { formatDistanceToNow } from "date-fns";
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  MoreHorizontal,
+  Edit2,
+  PauseCircle,
+  Archive,
+  LinkIcon,
+} from "lucide-react";
 import { StatusBadge } from "@/components/statusBadge/StatusBadge";
 import { ProgressBar } from "@/components/progressBar/ProgressBar";
+import { getRandomGradient } from "@/lib/randomGradientGen/randomGradientGen";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useUpdateClientStore } from "@/store/updateClientStore/useUpdateClientStore";
+import { useModalStore } from "@/store/modalStore/useModalStore";
+
+type Data = {
+  id: string;
+  name: string;
+  email: string;
+  totalHours: string;
+  hourlyRate: string;
+  currency: string;
+  refillLink?: string | null;
+};
 
 export const Clients = () => {
   const { data: clients, isLoading } = useGetAllClients();
-
+  const { openModal } = useModalStore();
+  const { setFormData } = useUpdateClientStore();
   // --- STATE ---
+  const [avatarBg] = useState(getRandomGradient());
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -29,6 +59,22 @@ export const Clients = () => {
     return filteredData.slice(start, start + itemsPerPage);
   }, [filteredData, currentPage]);
 
+  const editBtnHandler = (client: Data) => {
+    if (!client) return;
+    openModal("EDIT_CLIENT");
+    const totalHours = Number(client.totalHours);
+    const hourlyRate = Number(client.hourlyRate);
+    setFormData({
+      id: client.id,
+      name: client.name,
+      email: client.email,
+      totalHours: totalHours,
+      hourlyRate: hourlyRate,
+      currency: client.currency,
+      refillLink: client.refillLink,
+    });
+  };
+
   return (
     <div className={styles.clientsCard}>
       {isLoading ? (
@@ -44,13 +90,11 @@ export const Clients = () => {
             <table className={styles.clientsTable}>
               <thead className="clients-thead">
                 <tr>
-                  <th>Client</th>
-                  <th>Status</th>
+                  <th className={styles.client}>Client</th>
+                  <th className={styles.status}>Status</th>
                   <th className={styles.clientsUsageCol}>Usage</th>
-                  <th>Updated</th>
-                  <th className="clients-actions-head">
-                    <span className="sr-only">Actions</span>
-                  </th>
+                  <th className={styles.updated}>Updated</th>
+                  <th className={styles.actions}>Actions</th>
                 </tr>
               </thead>
 
@@ -59,7 +103,13 @@ export const Clients = () => {
                   <tr key={client.id} className="clients-row">
                     <td>
                       <div className={styles.clientCell}>
-                        <div className={styles.clientAvatar}>
+                        <div
+                          className={styles.clientAvatar}
+                          style={{
+                            background: `${avatarBg}`,
+                            color: "#000",
+                          }}
+                        >
                           {client.name.substring(0, 2).toUpperCase()}
                         </div>
                         <div className={styles.clientName}>{client.name}</div>
@@ -87,9 +137,34 @@ export const Clients = () => {
                     </td>
 
                     <td className={styles.clientsActions}>
-                      <button className="icon-button">
-                        <MoreHorizontal size={18} />
-                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            className="cursor-pointer"
+                            variant="outline"
+                            size="sm"
+                          >
+                            <MoreHorizontal size={18} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <LinkIcon size={14} /> Copy Public Link
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => editBtnHandler(client)}
+                          >
+                            <Edit2 size={14} /> Edit Client
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <PauseCircle size={14} /> Pause Retainer
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <Archive size={14} /> Archive
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 ))}

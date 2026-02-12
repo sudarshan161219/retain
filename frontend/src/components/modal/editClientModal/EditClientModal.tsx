@@ -1,56 +1,42 @@
 import { X, Loader2 } from "lucide-react";
-import { useCreateClientStore } from "@/store/createClientStore/useCreateClientStore";
 import { useModalStore } from "@/store/modalStore/useModalStore";
 import { Button } from "../../ui/button";
-import { useCreateClient } from "@/hooks/client/useCreateClient";
+import { useUpdateClient } from "@/hooks/client/useUpdateClient";
+import { useUpdateClientStore } from "@/store/updateClientStore/useUpdateClientStore";
 import styles from "./index.module.css";
 
-
-export const CreateClientModal = () => {
-  const { mutate, isPending } = useCreateClient();
+export const EditClientModal = () => {
   const { isOpen, type, closeModal } = useModalStore();
-  const {
-    name,
-    setName,
-    email,
-    setEmail,
-    hours,
-    setHours,
-    rate,
-    setRate,
-    currency,
-    setCurrency,
-    refillLink,
-    setRefillLink,
-  } = useCreateClientStore();
+  const { mutate, isPending } = useUpdateClient();
 
-  const totalValue = Number(hours || 0) * Number(rate || 0);
+  const { formData, setFormData } = useUpdateClientStore();
 
-  const handleCreate = () => {
-    if (!name || !email || !hours)
-      throw new Error("Name, Email and Hours are required");
+  const totalValue =
+    Number(formData.totalHours || 0) * Number(formData.hourlyRate || 0);
 
-    const totalHours = Number(hours);
-    const hourlyRate = Number(rate);
+  const handleUpdate = () => {
+    if (
+      !formData.id ||
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      formData.totalHours === ""
+    ) {
+      throw new Error(
+        "Missing required information: Name, Email, and Hours are mandatory.",
+      );
+    }
 
-    mutate({
-      name,
-      email,
-      totalHours,
-      hourlyRate,
-      currency,
-      refillLink,
-    });
+    mutate(formData);
   };
 
-  if (!isOpen || type !== "CREATE_CLIENT") return null;
+  if (!isOpen || type !== "EDIT_CLIENT") return null;
 
   return (
     <div className={styles.overlay} onClick={closeModal}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         {/* HEADER */}
         <div className={styles.header}>
-          <h2 className={styles.title}>Add New Client</h2>
+          <h2 className={styles.title}>Edit Client</h2>
           <button className={styles.closeBtn} onClick={closeModal}>
             <X size={20} />
           </button>
@@ -58,33 +44,31 @@ export const CreateClientModal = () => {
 
         {/* BODY */}
         <div className={styles.body}>
-          {/* Client Name */}
-
+          {/* Client Name & Email */}
           <div className={styles.row}>
             <div className={`${styles.formGroup} ${styles.col}`}>
-              <label htmlFor="name" className={styles.label}>
+              <label htmlFor="edit-name" className={styles.label}>
                 Client / Company Name
               </label>
               <input
-                id="name"
+                id="edit-name"
                 className={styles.input}
                 placeholder="e.g. Acme Corp"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={formData.name}
+                onChange={(e) => setFormData({ name: e.target.value })}
                 autoFocus
               />
             </div>
             <div className={`${styles.formGroup} ${styles.col}`}>
-              <label htmlFor="email" className={styles.label}>
+              <label htmlFor="edit-email" className={styles.label}>
                 Client Email
               </label>
               <input
-                id="email"
+                id="edit-email"
                 className={styles.input}
                 placeholder="e.g. client@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoFocus
+                value={formData.email}
+                onChange={(e) => setFormData({ email: e.target.value })}
               />
             </div>
           </div>
@@ -92,30 +76,34 @@ export const CreateClientModal = () => {
           {/* Hours & Rate Row */}
           <div className={styles.row}>
             <div className={`${styles.formGroup} ${styles.col}`}>
-              <label htmlFor="hours" className={styles.label}>
+              <label htmlFor="edit-hours" className={styles.label}>
                 Retainer Hours
               </label>
               <input
-                id="hours"
+                id="edit-hours"
                 type="number"
                 className={styles.input}
                 placeholder="20"
-                value={hours}
-                onChange={(e) => setHours(Number(e.target.value))}
+                value={formData.totalHours}
+                onChange={(e) =>
+                  setFormData({ totalHours: Number(e.target.value) })
+                }
               />
             </div>
             <div className={`${styles.formGroup} ${styles.col}`}>
-              <label htmlFor="hourlyRate" className={styles.label}>
+              <label htmlFor="edit-hourlyRate" className={styles.label}>
                 Hourly Rate
               </label>
               <div className="relative">
                 <input
-                  id="hourlyRate"
+                  id="edit-hourlyRate"
                   type="number"
                   className={styles.input}
                   placeholder="50"
-                  value={rate}
-                  onChange={(e) => setRate(Number(e.target.value))}
+                  value={formData.hourlyRate}
+                  onChange={(e) =>
+                    setFormData({ hourlyRate: Number(e.target.value) })
+                  }
                 />
               </div>
             </div>
@@ -123,14 +111,14 @@ export const CreateClientModal = () => {
 
           {/* Currency Select */}
           <div className={styles.formGroup}>
-            <label htmlFor="currency" className={styles.label}>
+            <label htmlFor="edit-currency" className={styles.label}>
               Currency
             </label>
             <select
-              id="currency"
+              id="edit-currency"
               className={styles.select}
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
+              value={formData.currency}
+              onChange={(e) => setFormData({ currency: e.target.value })}
             >
               <option value="USD">USD ($)</option>
               <option value="EUR">EUR (€)</option>
@@ -139,33 +127,30 @@ export const CreateClientModal = () => {
             </select>
           </div>
 
-          {/* Revenue Preview (Visual Feedback) */}
+          {/* Revenue Preview */}
           <div className={styles.previewBox}>
             <span className={styles.previewLabel}>Contract Value</span>
             <span className={styles.previewValue}>
               {new Intl.NumberFormat("en-US", {
                 style: "currency",
-                currency: currency,
+                currency: formData.currency,
               }).format(totalValue)}
             </span>
           </div>
 
           {/* Optional Refill Link */}
           <div className={styles.formGroup}>
-            <label htmlFor="refillLink" className={styles.label}>
+            <label htmlFor="edit-refillLink" className={styles.label}>
               Payment Link{" "}
               <span className="text-gray-400 font-normal">(Optional)</span>
             </label>
             <input
-              id="refillLink"
+              id="edit-refillLink"
               className={styles.input}
               placeholder="https://stripe.com/..."
-              value={refillLink}
-              onChange={(e) => setRefillLink(e.target.value)}
+              value={formData.refillLink ?? ""}
+              onChange={(e) => setFormData({ refillLink: e.target.value })}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              If left empty, will use your default global link.
-            </p>
           </div>
         </div>
 
@@ -182,11 +167,11 @@ export const CreateClientModal = () => {
           <Button
             variant="default"
             className="cursor-pointer"
-            onClick={handleCreate}
-            disabled={!name || !hours || isPending}
+            onClick={handleUpdate}
+            // disabled={!name || !hours || isPending}
           >
-            {isPending && <Loader2 size={16} className="animate-spin" />}
-            Create Client
+            {isPending && <Loader2 size={16} className="animate-spin mr-2" />}
+            Save Changes
           </Button>
         </div>
       </div>

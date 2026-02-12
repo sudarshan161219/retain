@@ -27,12 +27,36 @@ export const createClientValidators = [
 
 export const updateDetailsValidators = [
   param("id").isUUID().withMessage("Invalid Client ID"),
+
   body("name")
     .optional()
     .isString()
     .trim()
-    .isLength({ min: 1 })
+    .notEmpty()
     .withMessage("Name cannot be empty"),
+
+  body("email")
+    .optional()
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Must be a valid email address"),
+
+  body("hours")
+    .optional({ checkFalsy: true })
+    .isNumeric()
+    .withMessage("Hours must be a number"),
+
+  body("rate")
+    .optional({ checkFalsy: true })
+    .isNumeric()
+    .withMessage("Rate must be a number"),
+
+  body("currency")
+    .optional()
+    .isLength({ min: 3, max: 3 })
+    .toUpperCase()
+    .withMessage("Currency must be a 3-letter code"),
+
   body("refillLink")
     .optional({ nullable: true, checkFalsy: true })
     .isURL()

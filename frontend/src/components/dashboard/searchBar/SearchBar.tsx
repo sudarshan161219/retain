@@ -31,7 +31,7 @@ export const SearchBar = () => {
 
       <Select>
         <SelectTrigger className={styles.selectTrigger}>
-          <SelectValue placeholder="Theme" />
+          <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
