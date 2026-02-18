@@ -8,6 +8,7 @@ import {
 import { Nav } from "@/components/nav/Nav";
 import { NavLink, Link, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ModalManager } from "@/components/modal/modalManager/ModalManager";
 import styles from "./index.module.css";
 import { useSidebarStore } from "@/store/sidebarStore/useSidebarStore";
 import { CustomTooltip } from "@/components/customTooltip/CustomTooltip";
@@ -120,6 +121,7 @@ export const DesktopSidebar = () => {
         {/* Page Content */}
         <main className="flex-1 p-2 overflow-y-auto bg-background">
           <Outlet />
+          <ModalManager />
         </main>
       </div>
     </div>

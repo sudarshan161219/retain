@@ -5,6 +5,7 @@ import {
   Settings,
   Box,
 } from "lucide-react";
+import { ModalManager } from "@/components/modal/modalManager/ModalManager";
 import { NavLink } from "react-router-dom";
 import { Nav } from "@/components/nav/Nav";
 import { Link, Outlet, useLocation } from "react-router-dom";
@@ -98,6 +99,7 @@ export const MobileSidebar = () => {
 
         <main className={styles.main}>
           <Outlet />
+          <ModalManager />
         </main>
       </div>
 

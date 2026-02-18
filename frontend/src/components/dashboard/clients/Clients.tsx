@@ -10,11 +10,16 @@ import {
   PauseCircle,
   Archive,
   LinkIcon,
+  Check,
+  Copy,
+  PlayCircle,
 } from "lucide-react";
 import { StatusBadge } from "@/components/statusBadge/StatusBadge";
 import { ProgressBar } from "@/components/progressBar/ProgressBar";
 import { getRandomGradient } from "@/lib/randomGradientGen/randomGradientGen";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+// import { useUpdateStatus } from "@/hooks/client/useUpdateStatus";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUpdateClientStore } from "@/store/updateClientStore/useUpdateClientStore";
 import { useModalStore } from "@/store/modalStore/useModalStore";
+
 
 type Data = {
   id: string;
@@ -38,7 +44,9 @@ export const Clients = () => {
   const { data: clients, isLoading } = useGetAllClients();
   const { openModal } = useModalStore();
   const { setFormData } = useUpdateClientStore();
+  // const {} = useUpdateStatus();
   // --- STATE ---
+  const [copied, setCopied] = useState(false);
   const [avatarBg] = useState(getRandomGradient());
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,6 +67,18 @@ export const Clients = () => {
     return filteredData.slice(start, start + itemsPerPage);
   }, [filteredData, currentPage]);
 
+  const handleCopy = (slug: string) => {
+    const url = `${window.location.origin}/${slug}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    toast(
+      <div className="flex items-center gap-3">
+        <Check size={16} color="#16a34a" /> Public link copied!
+      </div>,
+    );
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const editBtnHandler = (client: Data) => {
     if (!client) return;
     openModal("EDIT_CLIENT");
@@ -73,6 +93,10 @@ export const Clients = () => {
       currency: client.currency,
       refillLink: client.refillLink,
     });
+  };
+
+  const handleStatus = (id: string, status: string) => {
+    console.log(id, status);
   };
 
   return (
@@ -148,8 +172,16 @@ export const Clients = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem className="cursor-pointer">
-                            <LinkIcon size={14} /> Copy Public Link
+                          <DropdownMenuItem
+                            onClick={() => handleCopy(client.slug)}
+                            className="cursor-pointer"
+                          >
+                            {copied ? (
+                              <Check size={16} color="#16a34a" />
+                            ) : (
+                              <Copy size={16} />
+                            )}{" "}
+                            Copy Public Link
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="cursor-pointer"
@@ -157,10 +189,31 @@ export const Clients = () => {
                           >
                             <Edit2 size={14} /> Edit Client
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer">
-                            <PauseCircle size={14} /> Pause Retainer
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleStatus(
+                                client.id,
+                                client.status === "PAUSED"
+                                  ? "ACTIVE"
+                                  : "PAUSED",
+                              )
+                            }
+                            className="cursor-pointer"
+                          >
+                            {client.status === "ACTIVE" ? (
+                              <>
+                                <PauseCircle size={14} /> Pause Retainer
+                              </>
+                            ) : (
+                              <>
+                                <PlayCircle size={14} /> Active Retainer
+                              </>
+                            )}
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer">
+                          <DropdownMenuItem
+                            onClick={() => handleStatus(client.id, "Archive")}
+                            className="cursor-pointer"
+                          >
                             <Archive size={14} /> Archive
                           </DropdownMenuItem>
                         </DropdownMenuContent>

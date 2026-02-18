@@ -1,5 +1,5 @@
 .header {
-  display: flex;
+  display: none;
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
@@ -10,6 +10,12 @@
   .header {
     flex-direction: row;
     align-items: center;
+  }
+}
+
+@media (min-width: 770px) {
+  .header {
+    display: flex;
   }
 }
 

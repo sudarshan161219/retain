@@ -5,7 +5,6 @@ import { Button } from "../../ui/button";
 import { useCreateClient } from "@/hooks/client/useCreateClient";
 import styles from "./index.module.css";
 
-
 export const CreateClientModal = () => {
   const { mutate, isPending } = useCreateClient();
   const { isOpen, type, closeModal } = useModalStore();
@@ -63,7 +62,7 @@ export const CreateClientModal = () => {
           <div className={styles.row}>
             <div className={`${styles.formGroup} ${styles.col}`}>
               <label htmlFor="name" className={styles.label}>
-                Client / Company Name
+                Client Name
               </label>
               <input
                 id="name"

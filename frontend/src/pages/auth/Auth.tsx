@@ -4,10 +4,16 @@ import { LoginForm } from "@/components/login-form";
 import styles from "./index.module.css";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore/useAuthStore";
+import { useUser } from "@/hooks/user/useUser";
 
 export const Auth = () => {
   const { isSignUp } = useAuthStore();
   const navigate = useNavigate();
+  const { data: user } = useUser();
+
+  if (user?.id) {
+    navigate(`/dashboard/${user.id}`);
+  }
 
   const handlenavigate = () => {
     navigate("/");

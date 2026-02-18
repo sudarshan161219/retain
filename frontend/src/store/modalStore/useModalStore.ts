@@ -8,6 +8,8 @@ export type ModalType =
   | "AUTH"
   | "CREATE_CLIENT"
   | "EDIT_CLIENT"
+  | "SEARCH_FILTERS"
+  | "QUICK_LOG"
   | null;
 
 interface ModalData {

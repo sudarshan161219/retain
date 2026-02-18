@@ -1,8 +1,6 @@
-import { CreateClientModal } from "@/components/modal/createClientModal/CreateClientModal";
-import { EditClientModal } from "@/components/modal/editClientModal/EditClientModal";
 import { Clients } from "@/components/dashboard/clients/Clients";
 import { Header } from "@/components/dashboard/header_actions/Header";
-import { SearchBar } from "@/components/dashboard/searchBar/SearchBar";
+import { Toolbar } from "@/components/dashboard/toolbar/Toolbar";
 import styles from "./index.module.css";
 export const Dashboard = () => {
   return (
@@ -10,14 +8,11 @@ export const Dashboard = () => {
       {/* 1. HEADER & ACTIONS */}
       <Header />
 
-      {/* 2. SEARCH BAR */}
-      <SearchBar />
-
+      {/* 2. Search Bar, Filter and Add Client Button */}
+      <Toolbar />
       {/* 3. CONTENT AREA */}
       <Clients />
 
-      <CreateClientModal />
-      <EditClientModal />
     </div>
   );
 };

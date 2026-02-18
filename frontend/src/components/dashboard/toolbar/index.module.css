@@ -1,0 +1,78 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.searchTrigger {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  color: var(--label);
+  font-size: 0.875rem;
+  width: 100%;
+  max-width: 350px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.searchTrigger:hover {
+  border-color: var(--ring);
+}
+
+.searchText {
+  flex: 1;
+  text-align: left;
+}
+
+.shortcut {
+  display: none;
+  font-size: 0.75rem;
+  background: var(--primary);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--background);
+  font-family: monospace;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.leftActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hideOnMobile {
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .shortcut {
+    display: inline-block;
+  }
+}
+
+@media (max-width: 640px) {
+  .searchText {
+    display: none;
+  }
+  .searchTrigger {
+    width: auto;
+    padding: 0.6rem;
+  }
+  .hideOnMobile {
+    display: none;
+  }
+}

@@ -7,7 +7,7 @@ export type Client = {
   slug: string;
   name: string;
   email: string;
-  status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+  status: "ACTIVE" | "PAUSED" | "ARCHIVED";
   refillLink: string | null;
   lastLogAt: string | null;
   totalHours: string;

@@ -1,42 +1,26 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
 import api from "@/lib/api/api";
 import { toast } from "sonner";
-import { useUpdateClientStore } from "@/store/updateClientStore/useUpdateClientStore";
-import { useModalStore } from "@/store/modalStore/useModalStore";
+import axios, { AxiosError } from "axios";
 
-type Data = {
-  id: string;
-  name: string;
-  email: string;
-  totalHours: number | "";
-  hourlyRate: number | "";
-  currency: string;
-  refillLink?: string | null;
-};
+export type ClientStatus = "ACTIVE" | "PAUSED" | "ARCHIVED";
 
 interface ApiError {
   message: string;
 }
 
-export const useUpdateClient = () => {
+export const useUpdateStatus = (clientId: string) => {
   const queryClient = useQueryClient();
-  const {
-    formData: { id },
-    reset,
-  } = useUpdateClientStore();
-  const { closeModal } = useModalStore();
-
   return useMutation({
-    mutationFn: async (data: Data) => {
-      const res = await api.patch(`/clients/${id}`, data);
-      return res.data;
+    mutationFn: async (status: ClientStatus) => {
+      const { data } = await api.patch(`/clients/${clientId}/status`, {
+        status,
+      });
+      return data.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (updatedClient) => {
+      toast.success(`Status updated to ${updatedClient.status}`);
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast.success(data.message);
-      closeModal();
-      reset();
     },
     onError: (err: unknown) => {
       if (axios.isAxiosError(err)) {
