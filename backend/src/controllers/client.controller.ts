@@ -87,13 +87,13 @@ export class ClientController {
       if (!req.user)
         throw new AppError({ message: "Unauthorized", statusCode: 401 });
 
-      const query = getClientsQuerySchema.parse(req.query);
-
       const userId = req.user.id;
+      const query = getClientsQuerySchema.parse(req.query);
+      const cleanSearch = query.search === "" ? undefined : query.search;
 
       const client = await this.clientService.getClients({
         userId: userId,
-        search: query.search,
+        search: cleanSearch,
         status: query.status,
         page: query.page,
         limit: query.limit,
@@ -333,7 +333,7 @@ export class ClientController {
 
       this.emitUpdate(updatedClient.slug, "STATUS_UPDATE", { status });
 
-      res.status(200).json({ data: updatedClient });
+      res.status(StatusCodes.OK).json({ data: updatedClient });
     } catch (error) {
       next(error);
     }

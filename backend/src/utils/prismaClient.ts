@@ -25,5 +25,5 @@ const adapter = new PrismaPg({
 
 export const prisma = new PrismaClient({
   adapter,
-  log: ["query", "info", "warn", "error"],
+  // log: ["query", "info", "warn", "error"],
 });

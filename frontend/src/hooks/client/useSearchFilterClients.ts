@@ -16,40 +16,45 @@ export type Client = {
   currency: string;
   createdAt: string;
   updatedAt: string;
+
+  hoursRemaining?: number;
 };
 
-export type ClientQueryParams = {
-  status?: "ACTIVE" | "PAUSED" | "ARCHIVED";
-  order?: "asc" | "desc";
+export type Query = {
+  search?: string;
+  status?: "ACTIVE" | "PAUSED";
+  page?: number;
+  limit?: number;
 };
 
-export const clientKeys = {
-  all: ["clients"] as const,
-  lists: (params?: ClientQueryParams) =>
-    [...clientKeys.all, "list", params] as const,
-};
+export const useSearchFilterClients = (query: Query) => {
+  const { search, status, page, limit } = query;
 
-export const useGetAllClients = (params?: ClientQueryParams) => {
-  const query = useQuery({
-    queryKey: clientKeys.lists(params),
+  return useQuery({
+    queryKey: ["clients", { search, status, page, limit }],
 
     queryFn: async ({ signal }) => {
       const { data } = await api.get<{ data: Client[] }>("/clients", {
         signal,
+        params: { search, status, page, limit },
       });
+
       return data.data;
     },
 
+    // PERFORMANCE OPTIMIZATIONS:
+    //  Don't refetch on window focus
     refetchOnWindowFocus: false,
 
-    staleTime: 1000 * 60 * 5,
+    //  Keep data "fresh" for 5 minutes
+    staleTime: 5 * 60 * 1000,
     gcTime: 1000 * 60 * 60 * 24,
 
+    //  Keep previous data while fetching new data
     placeholderData: (previousData) => previousData,
 
+    //  Only fetch if we have the minimum requirements
     enabled: true,
     refetchOnMount: false,
   });
-
-  return query;
 };

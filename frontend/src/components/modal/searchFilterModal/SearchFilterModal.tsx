@@ -1,49 +1,61 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { X, Search, ChevronRight, Inbox } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useModalStore } from "@/store/modalStore/useModalStore";
-import api from "@/lib/api/api";
 import styles from "./index.module.css";
+import {
+  type Client,
+  useSearchFilterClients,
+} from "@/hooks/client/useSearchFilterClients";
 
 export const SearchFilterModal = () => {
   const { isOpen, type, closeModal } = useModalStore();
   const navigate = useNavigate();
 
-  // Local Filter State
+  // Local States
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "PAUSED">(
     "ALL",
   );
 
-  // 1. Fetch Data Directly
-  const { data: clients, isLoading } = useQuery({
-    queryKey: ["clients"],
-    queryFn: async () => {
-      const res = await api.get("/clients");
-      return res.data;
-    },
-    enabled: isOpen && type === "SEARCH_FILTERS",
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  const {
+    data: clients,
+    isLoading,
+    isFetching,
+  } = useSearchFilterClients({
+    search: debouncedSearch,
+    status: statusFilter === "ALL" ? undefined : statusFilter,
+    page: 1,
+    limit: 20,
   });
 
-  // 2. Filter Logic (Memoized)
-  const filteredClients = useMemo(() => {
-    if (!clients) return [];
+  // 2. Map the data (Memoized)
+  const processedClients = useMemo(() => {
+    if (!clients?.length) return [];
 
-    return clients.data.filter((client: any) => {
-      const matchesSearch = client.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const matchesStatus =
-        statusFilter === "ALL" || client.status === statusFilter;
-      return matchesSearch && matchesStatus;
+    return clients.map((client: Client) => {
+      const total = Number(client.totalHours) || 0;
+      const logged = Number(client.hoursLogged) || 0;
+
+      return {
+        ...client,
+        hoursRemaining: Math.max(total - logged, 0),
+      };
     });
-  }, [clients, searchTerm, statusFilter]);
+  }, [clients]);
 
-  // Handle Navigation
   const handleSelectClient = (clientId: string) => {
     closeModal();
-    navigate(`/clients/${clientId}`); // Navigate to details page
+    navigate(`/clients/${clientId}`);
   };
 
   if (!isOpen || type !== "SEARCH_FILTERS") return null;
@@ -87,12 +99,12 @@ export const SearchFilterModal = () => {
           </div>
         </div>
 
-        {/* RESULTS LIST */}
+        {/* Results lists */}
         <div className={styles.resultsList}>
-          {isLoading ? (
+          {isLoading || (isFetching && !processedClients.length) ? (
             <div className={styles.emptyState}>Loading...</div>
-          ) : filteredClients.length > 0 ? (
-            filteredClients.map((client: any) => (
+          ) : processedClients.length > 0 ? (
+            processedClients.map((client: Client) => (
               <div
                 key={client.id}
                 className={styles.resultItem}
@@ -108,7 +120,7 @@ export const SearchFilterModal = () => {
                     </span>
                   </div>
                   <div className={styles.clientMeta}>
-                    {client.currentBalance} hrs remaining • {client.currency}
+                    {client.hoursRemaining} hrs remaining • {client.currency}
                   </div>
                 </div>
                 <ChevronRight size={16} className="text-gray-400" />

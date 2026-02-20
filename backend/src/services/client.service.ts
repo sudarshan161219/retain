@@ -67,25 +67,26 @@ export class ClientService {
     status,
     page = 1,
     limit = 10,
+    sortBy = "createdAt",
+    sortOrder = "desc",
   }: GetClientsParams) {
     const defaultPage = Math.max(1, page);
     const defaultLimit = Math.max(100, limit);
     const skip = (defaultPage - 1) * defaultLimit;
 
-    const isValidStatus =
-      status && Object.values(ClientStatus).includes(search as ClientStatus);
-
     const whereClause: Prisma.ClientWhereInput = {
       userId: userId,
-
+      status: status as ClientStatus | undefined,
       ...(search?.trim() && {
         OR: [
           { name: { contains: search.trim(), mode: "insensitive" } },
           { email: { contains: search.trim(), mode: "insensitive" } },
         ],
       }),
+    };
 
-      ...(isValidStatus && { status: status as ClientStatus }),
+    const orderByClause = {
+      [sortBy]: sortOrder,
     };
 
     const [client, total] = await prisma.$transaction([
@@ -93,9 +94,7 @@ export class ClientService {
         where: whereClause,
         skip: skip,
         take: limit,
-        orderBy: {
-          createdAt: "desc",
-        },
+        orderBy: orderByClause,
       }),
       prisma.client.count({ where: whereClause }),
     ]);

@@ -5,7 +5,6 @@ import {
   type NextFunction,
 } from "express";
 import { injectable, inject } from "inversify";
-import { param } from "express-validator";
 import { TYPES } from "../types/types.js";
 import { ClientController } from "../controllers/client.controller.js";
 import { authenticate } from "../middlewares/auth/auth.middleware.js";
@@ -113,7 +112,7 @@ export class ClientRouter {
      */
     this.router.patch(
       "/:id/status",
-      authenticate, // 🔒
+      authenticate,
       updateStatusValidators,
       validate,
       (req: Request, res: Response, next: NextFunction) =>
@@ -126,7 +125,7 @@ export class ClientRouter {
      */
     this.router.delete(
       "/:id",
-      authenticate, // 🔒
+      authenticate,
       idParamValidator,
       validate,
       (req: Request, res: Response, next: NextFunction) =>
@@ -143,7 +142,7 @@ export class ClientRouter {
      */
     this.router.post(
       "/:id/logs",
-      authenticate, // 🔒
+      authenticate,
       addLogValidators,
       validate,
       (req: Request, res: Response, next: NextFunction) =>
@@ -156,7 +155,7 @@ export class ClientRouter {
      */
     this.router.post(
       "/:id/refill",
-      authenticate, // 🔒
+      authenticate,
       refillValidators,
       validate,
       (req: Request, res: Response, next: NextFunction) =>
@@ -170,7 +169,7 @@ export class ClientRouter {
      */
     this.router.delete(
       "/logs/:logId",
-      authenticate, // 🔒
+      authenticate,
       logIdParamValidator,
       validate,
       (req: Request, res: Response, next: NextFunction) =>
@@ -183,7 +182,7 @@ export class ClientRouter {
      */
     this.router.get(
       "/:id/export",
-      authenticate, // 🔒
+      authenticate,
       idParamValidator,
       validate,
       (req: Request, res: Response, next: NextFunction) =>
