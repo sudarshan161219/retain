@@ -12,38 +12,27 @@ import { useModalStore } from "@/store/modalStore/useModalStore";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import styles from "./index.module.css";
+import { useToolbarStore } from "@/store/toolbarStore/useToolbarStore";
 
-interface ToolbarProps {
-  currentStatus: string;
-  onStatusChange: (value: string) => void;
-  sortOrder: "ASC" | "DESC";
-  onSortChange: (order: "ASC" | "DESC") => void;
-  onExport: () => void;
-}
-
-export const Toolbar = ({
-  currentStatus = "ACTIVE",
-  onStatusChange,
-  sortOrder,
-  onSortChange,
-  onExport,
-}: ToolbarProps) => {
+export const Toolbar = () => {
   const { openModal, isOpen } = useModalStore();
+  const { currentStatus, onStatusChange, sortOrder, onSortChange } =
+    useToolbarStore();
 
-  // Handle Cmd+K Shortcut
+  // Handle Ctrl+K Shortcut
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         openModal("SEARCH_FILTERS");
       }
-
-      console.log(e.key);
     };
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
@@ -65,13 +54,25 @@ export const Toolbar = ({
 
         <div className="w-35 hidden sm:block">
           <Select value={currentStatus} onValueChange={onStatusChange}>
-            <SelectTrigger className="cursor-pointer">
+            <SelectTrigger className="w-full cursor-pointer">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ACTIVE">Active</SelectItem>
-              <SelectItem value="PAUSED">Paused</SelectItem>
-              <SelectItem value="ARCHIVED">Archived</SelectItem>
+              <SelectGroup>
+                <SelectLabel>Status</SelectLabel>
+                <SelectItem className="cursor-pointer" value="ALL">
+                  All
+                </SelectItem>
+                <SelectItem className="cursor-pointer" value="ACTIVE">
+                  Active
+                </SelectItem>
+                <SelectItem className="cursor-pointer" value="PAUSED">
+                  Paused
+                </SelectItem>
+                <SelectItem className="cursor-pointer" value="ARCHIVED">
+                  Archived
+                </SelectItem>
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
@@ -80,10 +81,10 @@ export const Toolbar = ({
           variant="outline"
           size="icon"
           className="h-9 w-9 cursor-pointer"
-          onClick={() => onSortChange(sortOrder === "ASC" ? "DESC" : "ASC")}
-          title={`Sort ${sortOrder === "ASC" ? "Descending" : "Ascending"}`}
+          onClick={() => onSortChange(sortOrder === "asc" ? "desc" : "asc")}
+          title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
         >
-          {sortOrder === "ASC" ? (
+          {sortOrder === "asc" ? (
             <ArrowUpAZ size={16} />
           ) : (
             <ArrowDownAZ size={16} />
@@ -107,7 +108,7 @@ export const Toolbar = ({
         <Button
           variant="outline"
           size="icon"
-          onClick={onExport}
+          // onClick={onExport}
           title="Export CSV"
           className={styles.hideOnMobile}
         >

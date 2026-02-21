@@ -19,8 +19,22 @@ export type Client = {
 };
 
 export type ClientQueryParams = {
-  status?: "ACTIVE" | "PAUSED" | "ARCHIVED";
-  order?: "asc" | "desc";
+  status?: "ALL" | "ACTIVE" | "PAUSED" | "ARCHIVED";
+  sortOrder?: "asc" | "desc";
+  page?: number;
+  limit?: number;
+};
+
+export type PaginationMeta = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type PaginatedClientsResponse = {
+  data: Client[];
+  meta: PaginationMeta;
 };
 
 export const clientKeys = {
@@ -29,24 +43,24 @@ export const clientKeys = {
     [...clientKeys.all, "list", params] as const,
 };
 
-export const useGetAllClients = (params?: ClientQueryParams) => {
+export const useGetAllClients = (params: ClientQueryParams) => {
+  const { status, sortOrder, page, limit } = params;
   const query = useQuery({
     queryKey: clientKeys.lists(params),
 
     queryFn: async ({ signal }) => {
-      const { data } = await api.get<{ data: Client[] }>("/clients", {
+      const { data } = await api.get<PaginatedClientsResponse>("/clients", {
         signal,
+        params: { status, sortOrder, page, limit },
       });
-      return data.data;
+
+      return { clients: data.data, meta: data.meta };
     },
 
     refetchOnWindowFocus: false,
-
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60 * 24,
-
     placeholderData: (previousData) => previousData,
-
     enabled: true,
     refetchOnMount: false,
   });

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useGetAllClients } from "@/hooks/client/useGetAllClients";
 import styles from "./index.module.css";
 import { formatDistanceToNow } from "date-fns";
@@ -19,7 +19,7 @@ import { ProgressBar } from "@/components/progressBar/ProgressBar";
 import { getRandomGradient } from "@/lib/randomGradientGen/randomGradientGen";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-// import { useUpdateStatus } from "@/hooks/client/useUpdateStatus";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUpdateClientStore } from "@/store/updateClientStore/useUpdateClientStore";
 import { useModalStore } from "@/store/modalStore/useModalStore";
-
+import { useToolbarStore } from "@/store/toolbarStore/useToolbarStore";
 
 type Data = {
   id: string;
@@ -41,31 +41,22 @@ type Data = {
 };
 
 export const Clients = () => {
-  const { data: clients, isLoading } = useGetAllClients();
+  const { currentStatus, sortOrder, currentPage, setCurrentPage } =
+    useToolbarStore();
+  const { data, isLoading } = useGetAllClients({
+    status: currentStatus === "ALL" ? undefined : currentStatus,
+    sortOrder: sortOrder,
+    page: currentPage,
+    limit: 20,
+  });
+
+  const { clients, meta } = data || {};
+
   const { openModal } = useModalStore();
   const { setFormData } = useUpdateClientStore();
-  // const {} = useUpdateStatus();
   // --- STATE ---
   const [copied, setCopied] = useState(false);
   const [avatarBg] = useState(getRandomGradient());
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-
-  // --- LOGIC ---
-  const filteredData = useMemo(() => {
-    if (!clients) return [];
-    return clients.filter((c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [clients, searchTerm]);
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-  const currentData = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredData.slice(start, start + itemsPerPage);
-  }, [filteredData, currentPage]);
 
   const handleCopy = (slug: string) => {
     const url = `${window.location.origin}/${slug}`;
@@ -103,7 +94,7 @@ export const Clients = () => {
     <div className={styles.clientsCard}>
       {isLoading ? (
         <div className={styles.clientsLoading}>Loading clients...</div>
-      ) : currentData.length === 0 ? (
+      ) : clients?.length === 0 ? (
         <div className={styles.clientsEmpty}>
           <p className={styles.clientsEmptyText}>No clients found</p>
         </div>
@@ -123,7 +114,7 @@ export const Clients = () => {
               </thead>
 
               <tbody>
-                {currentData.map((client) => (
+                {clients?.map((client) => (
                   <tr key={client.id} className="clients-row">
                     <td>
                       <div className={styles.clientCell}>
@@ -227,7 +218,7 @@ export const Clients = () => {
 
           {/* MOBILE CARDS */}
           <div className={styles.clientsMobile}>
-            {currentData.map((client) => (
+            {clients?.map((client) => (
               <div key={client.id} className={styles.clientsMobileCard}>
                 {/* top row */}
                 <div className={styles.mobileHeader}>
@@ -297,29 +288,32 @@ export const Clients = () => {
       )}
 
       {/* PAGINATION */}
-      {filteredData.length > 0 && (
+      {clients && clients.length > 0 && meta && (
         <div className={styles.clientsPagination}>
           <div className={`${styles.paginationInfo} ${styles.desktopOnly}`}>
-            Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+            Page <strong>{meta.page}</strong> of{" "}
+            <strong>{meta.totalPages}</strong>
           </div>
 
           <div className={`${styles.paginationInfo} ${styles.mobileOnly}`}>
-            {currentPage} / {totalPages}
+            {meta.page} / {meta.totalPages}
           </div>
 
           <div className={styles.paginationButtons}>
             <button
               className={styles.paginationBtn}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={meta.page === 1}
             >
               <ChevronLeft size={14} />
             </button>
 
             <button
               className={styles.paginationBtn}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
+              onClick={() =>
+                setCurrentPage(Math.min(meta.totalPages, currentPage + 1))
+              }
+              disabled={meta.page >= meta.totalPages}
             >
               <ChevronRight size={14} />
             </button>
