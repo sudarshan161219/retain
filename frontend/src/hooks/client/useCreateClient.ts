@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import api from "@/lib/api/api";
 import { toast } from "sonner";
-import { useCreateClientStore } from "@/store/createClientStore/useCreateClientStore";
+import { useCreateClientStore } from "@/store/client/createClientStore/useCreateClientStore";
 import { useModalStore } from "@/store/modalStore/useModalStore";
 
 type Data = {

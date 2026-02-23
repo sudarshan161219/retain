@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { X, Loader2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useModalStore } from "@/store/modalStore/useModalStore";
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,12 +48,15 @@ export type Client = {
 export const QuickLogModal = () => {
   const { isOpen, type, closeModal } = useModalStore();
   const queryClient = useQueryClient();
-  const { data: clients, isLoading } = useGetAllClients();
+  const { data, isLoading } = useGetAllClients({});
+
   // Form State
   const [clientId, setClientId] = useState("");
   const [hours, setHours] = useState<number | "">("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Default Today
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+
+  const { clients } = data || {};
 
   // 1. Filter Active Clients for Dropdown
   const filteredData = useMemo(() => {
@@ -146,12 +150,31 @@ export const QuickLogModal = () => {
                         className={styles.ComboboxItem}
                         onClick={() => setClientId(client.id)}
                       >
-                        <span className="font-medium text-(--label)">
-                          {client.name}
-                        </span>
-                        <span className="text-xs text-(--label)">
-                          {client.hoursRemaining} hrs remaining
-                        </span>
+                        <div className={styles.clientListItem}>
+                          <div className={styles.clientsInfoLeft}>
+                            <div className={styles.clientAvatar}>
+                              {client.name.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                              <div>
+                                <span className="text-sm font-semibold text-(--label) transition-colors">
+                                  {client.name}
+                                </span>
+                              </div>
+
+                              <span className="text-sm font-medium text-(--label)">
+                                {client.hoursRemaining}
+                              </span>
+                              <span className="ml-1 text-xs text-(--label)">
+                                hrs remaining
+                              </span>
+                            </div>
+                          </div>
+
+                          <Badge className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
+                            {client.status}
+                          </Badge>
+                        </div>
                       </ComboboxItem>
                     )}
                   </ComboboxList>

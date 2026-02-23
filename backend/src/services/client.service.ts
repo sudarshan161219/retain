@@ -71,7 +71,7 @@ export class ClientService {
     sortOrder = "desc",
   }: GetClientsParams) {
     const defaultPage = Math.max(1, page);
-    const defaultLimit = Math.max(100, limit);
+    const defaultLimit = Math.min(100, Math.max(1, limit));
     const skip = (defaultPage - 1) * defaultLimit;
 
     const whereClause: Prisma.ClientWhereInput = {
@@ -93,7 +93,7 @@ export class ClientService {
       prisma.client.findMany({
         where: whereClause,
         skip: skip,
-        take: limit,
+        take: defaultLimit,
         orderBy: orderByClause,
       }),
       prisma.client.count({ where: whereClause }),

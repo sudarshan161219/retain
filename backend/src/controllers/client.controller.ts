@@ -97,12 +97,18 @@ export class ClientController {
         status: query.status,
         page: query.page,
         limit: query.limit,
+        sortOrder: query.sortOrder,
       });
+
+      const isArray = Array.isArray(client);
+
+      const responseData = isArray ? client : client.data;
+      const responseMeta = isArray ? null : client.meta;
 
       return res.status(StatusCodes.OK).json({
         status: "success",
-        data: client.data,
-        meta: client.meta,
+        data: responseData,
+        meta: responseMeta,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {

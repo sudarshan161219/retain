@@ -43,8 +43,8 @@ export const clientKeys = {
     [...clientKeys.all, "list", params] as const,
 };
 
-export const useGetAllClients = (params: ClientQueryParams) => {
-  const { status, sortOrder, page, limit } = params;
+export const useGetAllClients = (params?: ClientQueryParams) => {
+  const { status, sortOrder, page, limit } = params || {};
   const query = useQuery({
     queryKey: clientKeys.lists(params),
 

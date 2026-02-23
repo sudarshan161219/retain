@@ -14,19 +14,19 @@ import {
   Copy,
   PlayCircle,
 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { StatusBadge } from "@/components/statusBadge/StatusBadge";
 import { ProgressBar } from "@/components/progressBar/ProgressBar";
-import { getRandomGradient } from "@/lib/randomGradientGen/randomGradientGen";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-
+import { useClientStore } from "@/store/client/clientStore/useClientStore";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useUpdateClientStore } from "@/store/updateClientStore/useUpdateClientStore";
+import { useUpdateClientStore } from "@/store/client/updateClientStore/useUpdateClientStore";
 import { useModalStore } from "@/store/modalStore/useModalStore";
 import { useToolbarStore } from "@/store/toolbarStore/useToolbarStore";
 
@@ -41,8 +41,10 @@ type Data = {
 };
 
 export const Clients = () => {
+  const navigate = useNavigate();
   const { currentStatus, sortOrder, currentPage, setCurrentPage } =
     useToolbarStore();
+  const { setClientId } = useClientStore();
   const { data, isLoading } = useGetAllClients({
     status: currentStatus === "ALL" ? undefined : currentStatus,
     sortOrder: sortOrder,
@@ -56,7 +58,6 @@ export const Clients = () => {
   const { setFormData } = useUpdateClientStore();
   // --- STATE ---
   const [copied, setCopied] = useState(false);
-  const [avatarBg] = useState(getRandomGradient());
 
   const handleCopy = (slug: string) => {
     const url = `${window.location.origin}/${slug}`;
@@ -90,6 +91,11 @@ export const Clients = () => {
     console.log(id, status);
   };
 
+  const handleNavigation = (id: string) => {
+    navigate(`/client/${id}`);
+    setClientId(id);
+  };
+
   return (
     <div className={styles.clientsCard}>
       {isLoading ? (
@@ -115,19 +121,26 @@ export const Clients = () => {
 
               <tbody>
                 {clients?.map((client) => (
-                  <tr key={client.id} className="clients-row">
+                  <tr
+                    key={client.id}
+                    className="clients-row"
+                    onClick={() => handleNavigation(client.id)}
+                  >
                     <td>
                       <div className={styles.clientCell}>
-                        <div
-                          className={styles.clientAvatar}
-                          style={{
-                            background: `${avatarBg}`,
-                            color: "#000",
-                          }}
-                        >
+                        <div className={styles.clientAvatar}>
                           {client.name.substring(0, 2).toUpperCase()}
                         </div>
-                        <div className={styles.clientName}>{client.name}</div>
+                        <Link
+                          to={`/client/${client.id}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setClientId(client.id);
+                          }}
+                          className={`${styles.clientName} hover:underline hover:text-blue-600`}
+                        >
+                          {client.name}
+                        </Link>
                       </div>
                     </td>
 
@@ -151,7 +164,10 @@ export const Clients = () => {
                         : "Never"}
                     </td>
 
-                    <td className={styles.clientsActions}>
+                    <td
+                      className={styles.clientsActions}
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -219,7 +235,11 @@ export const Clients = () => {
           {/* MOBILE CARDS */}
           <div className={styles.clientsMobile}>
             {clients?.map((client) => (
-              <div key={client.id} className={styles.clientsMobileCard}>
+              <div
+                key={client.id}
+                onClick={() => handleNavigation(client.id)}
+                className={styles.clientsMobileCard}
+              >
                 {/* top row */}
                 <div className={styles.mobileHeader}>
                   <div className={styles.mobileclientInfo}>
@@ -227,7 +247,17 @@ export const Clients = () => {
                       {client.name.substring(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <h3 className={styles.mobileName}>{client.name}</h3>
+                      <Link
+                        to={`/client/${client.id}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setClientId(client.id);
+                        }}
+                        className={`${styles.mobileName} hover:underline hover:text-blue-600`}
+                      >
+                        {client.name}
+                      </Link>
+
                       <p className={styles.mobileUpdated}>
                         Updated{" "}
                         {client.lastLogAt
@@ -244,6 +274,7 @@ export const Clients = () => {
                         className="cursor-pointer"
                         variant="outline"
                         size="sm"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <MoreHorizontal size={18} />
                       </Button>

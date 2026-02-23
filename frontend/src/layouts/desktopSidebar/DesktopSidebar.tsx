@@ -12,9 +12,11 @@ import { ModalManager } from "@/components/modal/modalManager/ModalManager";
 import styles from "./index.module.css";
 import { useSidebarStore } from "@/store/sidebarStore/useSidebarStore";
 import { CustomTooltip } from "@/components/customTooltip/CustomTooltip";
+import { useUser } from "@/hooks/user/useUser";
 
 export const DesktopSidebar = () => {
   const location = useLocation();
+  const { data: user } = useUser();
   const { collapsed, toggleSidebar } = useSidebarStore();
 
   const menuItems = [
@@ -37,7 +39,7 @@ export const DesktopSidebar = () => {
       >
         <div className={styles.myHeader}>
           <NavLink
-            to="/dashboard"
+            to={`/dashboard/${user?.id}`}
             className="flex items-center gap-2 font-bold text-xl tracking-tight"
           >
             <Box size={24} className="text-primary" />
@@ -116,7 +118,7 @@ export const DesktopSidebar = () => {
       {/* Main Content */}
       <div className="flex flex-col flex-1">
         {/* Topbar */}
-        <Nav />
+        <Nav id={user?.id} />
 
         {/* Page Content */}
         <main className="flex-1 p-2 overflow-y-auto bg-background">

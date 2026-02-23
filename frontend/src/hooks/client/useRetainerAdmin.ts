@@ -7,7 +7,7 @@ export type ClientStatus = "ACTIVE" | "PAUSED" | "ARCHIVED";
 
 export const useRetainerAdmin = (clientId: string | undefined) => {
   const queryClient = useQueryClient();
-  // Unique cache key for this specific client
+
   const queryKey = ["client", clientId];
 
   // 1. FETCH CLIENT DATA
@@ -17,8 +17,8 @@ export const useRetainerAdmin = (clientId: string | undefined) => {
       const { data } = await api.get(`/clients/${clientId}`);
       return data as Client;
     },
-    enabled: !!clientId, // Only fetch if ID is present
-    staleTime: 1000 * 60 * 5, // Cache for 5 mins
+    enabled: !!clientId,
+    staleTime: 1000 * 60 * 5,
   });
 
   // 2. MUTATION: ADD LOG

@@ -2,7 +2,7 @@ import { X, Loader2 } from "lucide-react";
 import { useModalStore } from "@/store/modalStore/useModalStore";
 import { Button } from "../../ui/button";
 import { useUpdateClient } from "@/hooks/client/useUpdateClient";
-import { useUpdateClientStore } from "@/store/updateClientStore/useUpdateClientStore";
+import { useUpdateClientStore } from "@/store/client/updateClientStore/useUpdateClientStore";
 import styles from "./index.module.css";
 
 export const EditClientModal = () => {

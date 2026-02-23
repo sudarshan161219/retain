@@ -9,7 +9,6 @@ import {
   PlayCircle,
   PauseCircle,
   Archive,
-  AlertTriangle,
   Plus,
   Loader2,
   Pencil,
@@ -98,19 +97,7 @@ export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
 
   return (
     <div className={styles.stack}>
-      {/* 1. SECURITY WARNING */}
-      <div className={styles.warningCard}>
-        <AlertTriangle className={styles.warningIcon} size={20} />
-        <div>
-          <h3 className={styles.warningTitle}>Save your Admin Link</h3>
-          <p className={styles.warningText}>
-            Bookmark this page. If you lose this URL, you lose access to the
-            dashboard.
-          </p>
-        </div>
-      </div>
-
-      {/* 2. BUDGET & STATUS (The "Money" Card) */}
+      {/* 1. BUDGET & STATUS (The "Money" Card) */}
       <div className={styles.card}>
         <div className="flex justify-between items-start mb-6">
           <div>

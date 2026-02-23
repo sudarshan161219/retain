@@ -12,9 +12,11 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import styles from "./index.module.css";
 import { useSidebarStore } from "@/store/sidebarStore/useSidebarStore";
+import { useUser } from "@/hooks/user/useUser";
 
 export const MobileSidebar = () => {
   const location = useLocation();
+  const { data: user } = useUser();
   const { collapsed, toggleSidebar } = useSidebarStore();
 
   const menuItems = [
@@ -41,7 +43,7 @@ export const MobileSidebar = () => {
           }`}
         >
           <NavLink
-            to="/dashboard"
+            to={`/dashboard/${user?.id}`}
             className="flex items-center gap-2 font-bold text-xl tracking-tight"
           >
             <Box size={24} className="text-primary" />
@@ -95,7 +97,7 @@ export const MobileSidebar = () => {
       </div>
 
       <div className={styles.appcontainer}>
-        <Nav />
+        <Nav id={user?.id} />
 
         <main className={styles.main}>
           <Outlet />

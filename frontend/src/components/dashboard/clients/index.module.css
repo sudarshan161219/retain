@@ -107,6 +107,9 @@
   height: 2rem;
   width: 2rem;
   border-radius: 50%;
+  outline: 1px solid var(--border);
+  background-color: var(--primary);
+  color: var(--background);
   display: flex;
   align-items: center;
   justify-content: center;

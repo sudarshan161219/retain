@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
+import { SingleClient } from "@/pages/singleClient/SingleClient";
 import { ClientView } from "@/pages/clientView/ClientView";
 import { Landing } from "@/pages/landing/Landing";
 import { Auth } from "@/pages/auth/Auth";
@@ -19,6 +20,7 @@ export const AppRoutes = () => {
       <Route path="/auth" element={<Auth />} />
       <Route element={<PrivateRoutes />}>
         <Route path="/dashboard/:id" element={<Dashboard />} />
+        <Route path="/client/:id" element={<SingleClient />} />
       </Route>
       <Route path="/:slug" element={<ClientView />} />
     </Routes>

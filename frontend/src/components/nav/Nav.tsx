@@ -5,7 +5,7 @@ import { UserMenu } from "@/components/dashboard/userMenu/UserMenu";
 import { NavLink } from "react-router-dom";
 import { MainHeading } from "@/components/mainHeading/MainHeading";
 import styles from "./index.module.css";
-export const Nav = () => {
+export const Nav = ({ id }: { id: string | undefined }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const { toggleSidebar } = useSidebarStore();
 
@@ -35,7 +35,7 @@ export const Nav = () => {
       {/* --- Center: Name and logo (mobile) --- */}
       {isMobile && (
         <NavLink
-          to="/dashboard"
+          to={`/dashboard/${id}`}
           className="flex items-center gap-2 font-bold text-xl tracking-tight"
         >
           <Box size={24} className="text-primary" />

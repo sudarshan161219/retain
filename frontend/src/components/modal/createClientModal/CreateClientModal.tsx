@@ -1,5 +1,5 @@
 import { X, Loader2 } from "lucide-react";
-import { useCreateClientStore } from "@/store/createClientStore/useCreateClientStore";
+import { useCreateClientStore } from "@/store/client/createClientStore/useCreateClientStore";
 import { useModalStore } from "@/store/modalStore/useModalStore";
 import { Button } from "../../ui/button";
 import { useCreateClient } from "@/hooks/client/useCreateClient";

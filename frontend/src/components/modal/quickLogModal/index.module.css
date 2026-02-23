@@ -71,6 +71,25 @@
   font-size: 0.8rem;
 }
 
+.clientsInfoLeft {
+  display: flex;
+}
+
+.clientAvatar {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  outline: 1px solid var(--border);
+  background-color: var(--primary);
+  color: var(--background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-right: 0.75rem;
+}
+
 .ComboboxItem {
   cursor: pointer;
   display: flex;
@@ -80,6 +99,13 @@
 
 .ComboboxItem:focus {
   border: 1px solid var(--ring);
+}
+
+.clientListItem {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .textarea {
