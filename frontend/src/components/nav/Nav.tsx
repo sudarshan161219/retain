@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { Box, Menu } from "lucide-react";
+import { Box, Maximize, Menu, Minimize } from "lucide-react";
 import { useSidebarStore } from "@/store/sidebarStore/useSidebarStore";
 import { UserMenu } from "@/components/dashboard/userMenu/UserMenu";
 import { NavLink } from "react-router-dom";
 import { MainHeading } from "@/components/mainHeading/MainHeading";
+import { useFullscreen } from "@/hooks/fullscreen/useFullscreen";
 import styles from "./index.module.css";
+
 export const Nav = ({ id }: { id: string | undefined }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const { isFullscreen, toggleFullscreen } = useFullscreen();
   const { toggleSidebar } = useSidebarStore();
 
   useEffect(() => {
@@ -45,6 +48,17 @@ export const Nav = ({ id }: { id: string | undefined }) => {
 
       {/* --- Right: Actions --- */}
       <div className={styles.rightSection}>
+        <button
+          onClick={toggleFullscreen}
+          title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          className={styles.toggleFullScreen}
+        >
+          {isFullscreen ? (
+            <Minimize className={styles.toggleScreenIcon} size={17} />
+          ) : (
+            <Maximize className={styles.toggleScreenIcon} size={17} />
+          )}
+        </button>
         <UserMenu />
       </div>
     </nav>

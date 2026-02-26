@@ -187,7 +187,7 @@ export const Clients = () => {
                               <Check size={16} color="#16a34a" />
                             ) : (
                               <Copy size={16} />
-                            )}{" "}
+                            )}
                             Copy Public Link
                           </DropdownMenuItem>
                           <DropdownMenuItem

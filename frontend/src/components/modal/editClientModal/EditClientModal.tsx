@@ -29,6 +29,17 @@ export const EditClientModal = () => {
     mutate(formData);
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    if (name === "totalHours" || name === "hourlyRate") {
+      const val = value === "" ? "" : Number(value);
+      setFormData({ [name]: val });
+    } else {
+      setFormData({ [name]: value });
+    }
+  };
+
   if (!isOpen || type !== "EDIT_CLIENT") return null;
 
   return (
@@ -55,7 +66,8 @@ export const EditClientModal = () => {
                 className={styles.input}
                 placeholder="e.g. Acme Corp"
                 value={formData.name}
-                onChange={(e) => setFormData({ name: e.target.value })}
+                name="name"
+                onChange={handleChange}
                 autoFocus
               />
             </div>
@@ -68,7 +80,8 @@ export const EditClientModal = () => {
                 className={styles.input}
                 placeholder="e.g. client@email.com"
                 value={formData.email}
-                onChange={(e) => setFormData({ email: e.target.value })}
+                name="email"
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -85,9 +98,8 @@ export const EditClientModal = () => {
                 className={styles.input}
                 placeholder="20"
                 value={formData.totalHours}
-                onChange={(e) =>
-                  setFormData({ totalHours: Number(e.target.value) })
-                }
+                name="totalHours"
+                onChange={handleChange}
               />
             </div>
             <div className={`${styles.formGroup} ${styles.col}`}>
@@ -101,9 +113,8 @@ export const EditClientModal = () => {
                   className={styles.input}
                   placeholder="50"
                   value={formData.hourlyRate}
-                  onChange={(e) =>
-                    setFormData({ hourlyRate: Number(e.target.value) })
-                  }
+                  name="hourlyRate"
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -118,6 +129,7 @@ export const EditClientModal = () => {
               id="edit-currency"
               className={styles.select}
               value={formData.currency}
+              name="currency"
               onChange={(e) => setFormData({ currency: e.target.value })}
             >
               <option value="USD">USD ($)</option>
@@ -149,7 +161,8 @@ export const EditClientModal = () => {
               className={styles.input}
               placeholder="https://stripe.com/..."
               value={formData.refillLink ?? ""}
-              onChange={(e) => setFormData({ refillLink: e.target.value })}
+              name="refillLink"
+              onChange={handleChange}
             />
           </div>
         </div>

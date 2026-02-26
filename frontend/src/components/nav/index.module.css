@@ -122,6 +122,20 @@
   transform: translateY(-1px);
 }
 
+.toggleFullScreen {
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.toggleScreenIcon {
+  color: var(--label);
+}
+
+.toggleScreenIcon:hover {
+  color: var(--primary);
+}
+
 @media (max-width: 640px) {
   .nav {
     padding: 0 1rem;

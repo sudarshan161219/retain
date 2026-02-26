@@ -16,12 +16,15 @@ export type Client = {
   currency: string;
   createdAt: string;
   updatedAt: string;
+  logs: [];
 };
 
 export type ClientsResponse = {
   data: Client;
   role: string;
 };
+
+// const queryKey = ["client", clientId];
 
 export const clientKeys = {
   all: ["clients"] as const,

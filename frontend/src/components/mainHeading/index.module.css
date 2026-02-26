@@ -4,6 +4,10 @@
   color: var(--accent-foreground);
 }
 
+.headersubtitle {
+  font-size: 0.75rem;
+  color: var(--label);
+}
 /* mainHeading text-accent-foreground */
 
 @media (min-width: 768px) {
