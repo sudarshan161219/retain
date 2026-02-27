@@ -67,6 +67,9 @@ model Client {
   // The "Live Balance". Updated automatically when logs are added.
   hoursLogged  Decimal  @default(0.00) @db.Decimal(10, 2)
 
+
+  remainingHours Decimal @default(0.00) @db.Decimal(10, 2)
+
   // Revenue Calculation: (hourlyRate * totalHours)
   hourlyRate  Decimal  @default(0.00) @db.Decimal(10, 2) 
   currency    String   @default("USD")

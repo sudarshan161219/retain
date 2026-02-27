@@ -1,23 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api/api";
-
-export type Client = {
-  id: string;
-  userId: string;
-  slug: string;
-  name: string;
-  email: string;
-  status: "ACTIVE" | "PAUSED" | "ARCHIVED";
-  refillLink: string | null;
-  lastLogAt: string | null;
-  totalHours: string;
-  hoursLogged: string;
-  hourlyRate: string;
-  currency: string;
-  createdAt: string;
-  updatedAt: string;
-  logs: [];
-};
+import { type Client } from "@/types/client/client";
 
 export type ClientsResponse = {
   data: Client;

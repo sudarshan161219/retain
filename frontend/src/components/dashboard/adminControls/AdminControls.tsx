@@ -37,6 +37,7 @@ type Data = {
   totalHours: string;
   hourlyRate: string;
   hoursLogged: string;
+  remainingHours: number;
   currency: string;
   refillLink?: string | null;
   slug: string;
@@ -127,6 +128,8 @@ export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
   const totalValue = totalHours * rate;
 
   const remainingHrs = totalHours - hoursLogged;
+
+  console.log(client.remainingHours);
 
   const formatMoney = (amount: number) =>
     new Intl.NumberFormat("en-US", {
@@ -222,11 +225,11 @@ export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
           <div className={styles.budgetsection}>
             <p className={styles.budgetlabel}>Remaining</p>
             <p className={styles.budgetvalue}>
-              {remainingHrs.toFixed(2)}
+              {client.remainingHours}
               <span className={styles.budgetunit}>hrs</span>
             </p>
             <p
-              className={`text-xs font-medium mt-1 ${remainingHrs < 2 ? "text-red-400" : "text-emerald-600"}`}
+              className={`text-xs font-medium mt-1 ${client.remainingHours < 2 ? "text-red-400" : "text-emerald-600"}`}
             >
               {formatMoney(remainingValue)} unbilled
             </p>

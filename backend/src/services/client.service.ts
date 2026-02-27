@@ -50,6 +50,7 @@ export class ClientService {
         email: data.email,
         slug,
         totalHours: data.totalHours,
+        remainingHours: data.totalHours,
         hoursLogged: 0,
         hourlyRate: data.hourlyRate || 0,
         currency: data.currency || "USD",
@@ -216,31 +217,34 @@ export class ClientService {
         });
       }
 
+      const clientUpdateData: Prisma.ClientUpdateInput = {
+        lastLogAt: date,
+      };
+
+      if (type === "WORK") {
+        clientUpdateData.hoursLogged = { increment: hours };
+        clientUpdateData.remainingHours = { decrement: hours };
+      } else if (type === "REFILL") {
+        clientUpdateData.totalHours = { increment: hours };
+        clientUpdateData.remainingHours = { increment: hours };
+      }
+
+      await tx.client.update({
+        where: { id: clientId },
+        data: clientUpdateData,
+      });
+
       // 2. Create the Log
       const newLog = await tx.workLog.create({
         data: {
           clientId: client.id,
           description,
-          hours, // e.g., 2.5
+          hours,
           date,
           type,
         },
         include: {
-          client: true, // Return client info so Controller can emit to the correct 'slug' room
-        },
-      });
-
-      // 3. Update the "Bank Balance"
-      // If type is WORK, we subtract hours.
-      // If type is REFILL, we add hours.
-      const operation = type === "REFILL" ? "increment" : "decrement";
-
-      await tx.client.update({
-        where: { id: clientId },
-        data: {
-          hoursLogged: {
-            [operation]: hours,
-          },
+          client: true,
         },
       });
 

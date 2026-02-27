@@ -17,9 +17,12 @@ export const MainHeading: FC = (): ReactElement => {
 
     if (id && uuidRegex.test(id)) {
       heading = "Clients";
-      subtitle = "Manage your active retainers.";
-
-      console.log(heading);
+      subtitle = "Manage your all retainers.";
+    }
+  } else if (path.startsWith("/client/")) {
+    const id = path.split("/client/")[1];
+    if (id && uuidRegex.test(id)) {
+      heading = "Console";
     }
   } else if (path.startsWith("/reports/")) {
     const id = path.split("/reports/")[1];

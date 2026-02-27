@@ -16,6 +16,7 @@ interface ClientData {
   totalHours: string | number;
   refillLink?: string | null;
   status: "ACTIVE" | "PAUSED" | "ARCHIVED";
+  remainingHours: string;
   logs: WorkLog[];
 }
 
@@ -30,9 +31,11 @@ export const PublicRetainerCard = ({ client }: PublicRetainerCardProps) => {
   const used = client.logs
     .filter((log: any) => log.type !== "REFILL")
     .reduce((acc: number, log: any) => acc + Number(log.hours), 0);
+
   const percentage = Math.min((used / total) * 100, 100);
   const isOverBudget = used > total;
-  const remaining = total - used;
+
+  const remaining = parseFloat(client.remainingHours) || 0;
 
   // Helper to determine status color class
   const getStatusClass = (status: string) => {
@@ -102,7 +105,7 @@ export const PublicRetainerCard = ({ client }: PublicRetainerCardProps) => {
                   }`}
                 >
                   {remaining < 0 ? "+" : ""}
-                  {remaining.toFixed(2)} hrs
+                  {remaining.toFixed(2)}hrs
                 </p>
                 <p className={styles.remainingLabel}>
                   {isOverBudget ? "Over Budget" : "Remaining"}
