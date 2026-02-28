@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api/api";
 import { toast } from "sonner";
 import axios, { AxiosError } from "axios";
+import { clientKeys } from "@/hooks/client/querykeys/clientKeys";
 
 export type ClientStatus = "ACTIVE" | "PAUSED" | "ARCHIVED";
 
@@ -20,7 +21,9 @@ export const useUpdateStatus = (clientId: string) => {
     },
     onSuccess: (updatedClient) => {
       toast.success(`Status updated to ${updatedClient.status}`);
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      queryClient.invalidateQueries({
+        queryKey: clientKeys.detail(clientId),
+      });
     },
     onError: (err: unknown) => {
       if (axios.isAxiosError(err)) {

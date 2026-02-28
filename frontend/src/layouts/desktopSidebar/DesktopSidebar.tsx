@@ -23,7 +23,7 @@ export const DesktopSidebar = () => {
     {
       label: "Dashboard",
       icon: <LayoutDashboard size={20} />,
-      path: "/dashboard",
+      path: `/dashboard/${user?.id}`,
     },
     { label: "Reports", icon: <FileText size={20} />, path: "/reports" },
     { label: "Settings", icon: <Settings size={20} />, path: "/settings" },

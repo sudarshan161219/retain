@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import api from "@/lib/api/api";
+import { clientKeys } from "@/hooks/client/querykeys/clientKeys";
 import { toast } from "sonner";
 import { useUpdateClientStore } from "@/store/client/updateClientStore/useUpdateClientStore";
 import { useModalStore } from "@/store/modalStore/useModalStore";
@@ -33,7 +34,13 @@ export const useUpdateClient = () => {
       return res.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      queryClient.invalidateQueries({
+        queryKey: clientKeys.detail(id),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: clientKeys.lists(),
+      });
       toast.success(data.message);
       closeModal();
       reset();

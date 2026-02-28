@@ -1,18 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api/api";
 import { type Client } from "@/types/client/client";
+import { clientKeys } from "@/hooks/client/querykeys/clientKeys";
 
 export type ClientsResponse = {
   data: Client;
   role: string;
-};
-
-// const queryKey = ["client", clientId];
-
-export const clientKeys = {
-  all: ["clients"] as const,
-  lists: () => [...clientKeys.all, "list"] as const,
-  detail: (id: string) => [...clientKeys.all, "detail", id] as const,
 };
 
 export const useGetClientById = (clientId: string | null) => {

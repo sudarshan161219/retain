@@ -28,6 +28,7 @@ import styles from "./index.module.css";
 import { useUpdateClientStore } from "@/store/client/updateClientStore/useUpdateClientStore";
 import { useUpdateStatus } from "@/hooks/client/useUpdateStatus";
 import { toast } from "sonner";
+import { useAddLog } from "@/hooks/client/useAddLog";
 
 type Data = {
   id: string;
@@ -37,7 +38,7 @@ type Data = {
   totalHours: string;
   hourlyRate: string;
   hoursLogged: string;
-  remainingHours: number;
+  remainingHours: string;
   currency: string;
   refillLink?: string | null;
   slug: string;
@@ -52,12 +53,13 @@ interface AdminControlsProps {
 export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
   const { openModal } = useModalStore();
   const { setFormData } = useUpdateClientStore();
+  const { mutate: addLog, isPending: isAddingLog } = useAddLog(adminToken);
   const { mutate } = useUpdateStatus(adminToken);
   const {
-    addLog,
+    // addLog,
     updateStatus,
     updateDetails,
-    isAddingLog,
+    // isAddingLog,
     isUpdatingStatus,
     isUpdatingDetails,
   } = useRetainerAdmin(adminToken);
@@ -121,15 +123,12 @@ export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
 
   // 2. Calculate Remaining
   const totalHours = Number(client.totalHours);
-  const hoursLogged = Number(client.hoursLogged || 0);
   const rate = Number(client.hourlyRate || 0);
   const remainingValue = Number(client.hoursLogged || 0) * rate;
 
   const totalValue = totalHours * rate;
 
-  const remainingHrs = totalHours - hoursLogged;
-
-  console.log(client.remainingHours);
+  const remaining = parseFloat(client.remainingHours) || 0;
 
   const formatMoney = (amount: number) =>
     new Intl.NumberFormat("en-US", {
@@ -225,11 +224,11 @@ export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
           <div className={styles.budgetsection}>
             <p className={styles.budgetlabel}>Remaining</p>
             <p className={styles.budgetvalue}>
-              {client.remainingHours}
+              {remaining.toFixed(2)}
               <span className={styles.budgetunit}>hrs</span>
             </p>
             <p
-              className={`text-xs font-medium mt-1 ${client.remainingHours < 2 ? "text-red-400" : "text-emerald-600"}`}
+              className={`text-xs font-medium mt-1 ${remaining < 2 ? "text-red-400" : "text-emerald-600"}`}
             >
               {formatMoney(remainingValue)} unbilled
             </p>
