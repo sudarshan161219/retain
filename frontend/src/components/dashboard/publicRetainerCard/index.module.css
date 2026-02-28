@@ -58,6 +58,15 @@
   gap: 2rem; /* space-y-8 equivalent */
 }
 
+.cardContainer {
+  background-color: var(--card);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
 /* Progress Stats */
 .statsRow {
   display: flex;
@@ -199,6 +208,55 @@
   font-size: 0.875rem;
 }
 
+.logList {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.75rem;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  transition: border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+.logList:hover {
+  opacity: 0.8;
+}
+
+.logDescription {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary);
+  line-height: 1.375;
+}
+
+.logDate {
+  font-size: 0.75rem;
+  color: var(--label);
+  margin-top: 0.25rem;
+}
+
+.logDateBadge {
+  margin-left: 0.5rem;
+  color: #059669;
+  font-weight: 500;
+  background-color: var(--primary);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+}
+
+.logHrsBadge {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary);
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.375rem;
+}
+
 .logItem {
   display: flex;
   justify-content: space-between;
@@ -218,10 +276,10 @@
   background-color: var(--zinc-900-50);
 }
 
-.logDescription {
+/* .logDescription {
   flex: 1;
   padding-right: 1rem;
-}
+} */
 
 .descText {
   color: var(--popover-foreground);
