@@ -30,8 +30,54 @@ model User {
   defaultRefillLink String?
 
   clients   Client[]
+  workspace   Workspace?
+  preference  Preference?
 }
 
+
+model Workspace {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // --- BUSINESS DETAILS ---
+  businessName        String?
+  logoUrl             String?
+  taxId               String?  // For EIN, VAT, etc.
+  
+  // --- DEFAULTS ---
+  defaultHourlyRate   Decimal?
+  defaultCurrency     String   @default("USD")
+  defaultRefillLink   String?  // Moved here from the User model
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Preference {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // --- FORMATTING ---
+  // Store the date-fns format string directly, e.g., "MM/dd/yyyy" or "dd MMM yyyy"
+  dateFormat          DateFormat @default(SYSTEM_DEFAULT)
+  
+  // Timezone is critical for a time-logging app to prevent off-by-one-day errors
+  timezone            String   @default("UTC")         
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+
+
+enum DateFormat {
+  SYSTEM_DEFAULT // MMM d, yyyy (e.g., Dec 31, 2026)
+  EUROPEAN       // dd/MM/yyyy (e.g., 31/12/2026)
+  US_SLASH       // MM/dd/yyyy (e.g., 12/31/2026)
+  ISO_8601       // yyyy-MM-dd (e.g., 2026-12-31)
+}
 
 
 enum ClientStatus {
