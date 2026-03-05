@@ -2,6 +2,11 @@ import { Container } from "inversify";
 import { AuthService } from "../services/auth.service.js";
 import { AuthController } from "../controllers/auth.controller.js";
 import { AuthRouter } from "../routes/auth.router.js";
+
+import { UserService } from "../services/user.service.js";
+import { UserController } from "../controllers/user.controller.js";
+import { UserRouter } from "../routes/user.router.js";
+
 import { ClientService } from "../services/client.service.js";
 import { ClientController } from "../controllers/client.controller.js";
 import { ClientRouter } from "../routes/client.routes.js";
@@ -9,14 +14,23 @@ import { TYPES } from "../types/types.js";
 
 export const container: Container = new Container();
 
+// Auth
 container
   .bind<AuthService>(TYPES.AuthService)
   .to(AuthService)
   .inTransientScope();
-
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
 container.bind<AuthRouter>(TYPES.AuthRouter).to(AuthRouter);
 
+// User
+container
+  .bind<UserService>(TYPES.UserService)
+  .to(UserService)
+  .inTransientScope();
+container.bind<UserController>(TYPES.UserController).to(UserController);
+container.bind<UserRouter>(TYPES.UserRouter).to(UserRouter);
+
+// Client
 container
   .bind<ClientService>(TYPES.ClientService)
   .to(ClientService)

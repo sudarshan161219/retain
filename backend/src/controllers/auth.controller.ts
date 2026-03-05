@@ -4,8 +4,7 @@ import type { Request, Response, NextFunction } from "express";
 import { AuthService } from "../services/auth.service.js";
 import { TYPES } from "../types/types.js";
 import { AppError } from "../errors/AppError.js";
-// Ensure this path matches your file structure
-import type { AuthRequest } from "../types/express/index.js";
+
 
 @injectable()
 export class AuthController {

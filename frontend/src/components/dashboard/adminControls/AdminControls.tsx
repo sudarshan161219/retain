@@ -29,6 +29,8 @@ import { useUpdateClientStore } from "@/store/client/updateClientStore/useUpdate
 import { useUpdateStatus } from "@/hooks/client/useUpdateStatus";
 import { toast } from "sonner";
 import { useAddLog } from "@/hooks/client/useAddLog";
+import { DatePicker } from "@/components/datePicker/DatePicker";
+import { useDateStore } from "@/store/dateStore/useDateStore";
 
 type Data = {
   id: string;
@@ -52,14 +54,14 @@ interface AdminControlsProps {
 
 export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
   const { openModal } = useModalStore();
+  const { date: datePicker } = useDateStore();
   const { setFormData } = useUpdateClientStore();
   const { mutate: addLog, isPending: isAddingLog } = useAddLog(adminToken);
   const { mutate } = useUpdateStatus(adminToken);
   const {
-    // addLog,
     updateStatus,
     updateDetails,
-    // isAddingLog,
+
     isUpdatingStatus,
     isUpdatingDetails,
   } = useRetainerAdmin(adminToken);
@@ -92,7 +94,7 @@ export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
       {
         description: logData.description,
         hours: Number(logData.hours),
-        date: new Date(logData.date).toISOString(),
+        date: new Date(datePicker).toISOString(),
       },
       {
         onSuccess: () =>
@@ -136,6 +138,8 @@ export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
       currency: client.currency || "USD",
     }).format(amount);
 
+  console.log(logData.date);
+
   return (
     <div className={styles.stack}>
       {/* 1. BUDGET & STATUS (The "Money" Card) */}
@@ -165,11 +169,11 @@ export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
 
             <DropdownMenu>
               <DropdownMenuTrigger className="cursor-pointer" asChild>
-                <Button variant="outline" size="icon">
-                  <MoreHorizontal size={16} />
+                <Button variant="outline" size="sm">
+                  <MoreHorizontal size={15} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   className="cursor-pointer"
                   onClick={editBtnHandler}
@@ -301,18 +305,8 @@ export const AdminControls = ({ adminToken, client }: AdminControlsProps) => {
                 disabled={client.status !== "ACTIVE"}
               />
             </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>Date</label>
-              <input
-                type="date"
-                className={styles.input}
-                value={logData.date}
-                onChange={(e) =>
-                  setLogData({ ...logData, date: e.target.value })
-                }
-                disabled={client.status !== "ACTIVE"}
-              />
-            </div>
+
+            <DatePicker />
           </div>
           <Button
             type="submit"

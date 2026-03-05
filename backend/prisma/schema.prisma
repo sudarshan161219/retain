@@ -43,7 +43,7 @@ model Workspace {
   // --- BUSINESS DETAILS ---
   businessName        String?
   logoUrl             String?
-  taxId               String?  // For EIN, VAT, etc.
+  taxId               String?  
   
   // --- DEFAULTS ---
   defaultHourlyRate   Decimal?
@@ -61,7 +61,7 @@ model Preference {
   
   // --- FORMATTING ---
   // Store the date-fns format string directly, e.g., "MM/dd/yyyy" or "dd MMM yyyy"
-  dateFormat          DateFormat @default(SYSTEM_DEFAULT)
+  dateFormat         String   @default("MMM d, yyyy")
   
   // Timezone is critical for a time-logging app to prevent off-by-one-day errors
   timezone            String   @default("UTC")         

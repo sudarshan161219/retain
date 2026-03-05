@@ -1,0 +1,42 @@
+.container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  position: relative;
+  background-color: inherit;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.525rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s;
+  color: var(--primary);
+}
+
+.input:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--border);
+}
+
+.label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--label);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.popOver {
+  position: absolute;
+  background-color: inherit;
+  border: none;
+  cursor: pointer;
+  right: 0;
+  top: 20px;
+}

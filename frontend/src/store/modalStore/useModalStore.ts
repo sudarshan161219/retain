@@ -11,6 +11,8 @@ export type ModalType =
   | "SEARCH_FILTERS"
   | "QUICK_LOG"
   | "DELETE_CLIENT"
+  | "EDIT_LOG"
+  | "DELETE_LOG"
   | null;
 
 interface ModalData {

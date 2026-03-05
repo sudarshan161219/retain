@@ -6,6 +6,7 @@ import { CreateClientModal } from "../createClientModal/CreateClientModal";
 import { EditClientModal } from "../editClientModal/EditClientModal";
 import { SearchFilterModal } from "../searchFilterModal/SearchFilterModal";
 import { QuickLogModal } from "../quickLogModal/QuickLogModal";
+import { EditLogModal } from "../editLogModal/EditLogModal";
 
 export const ModalManager = () => {
   const { isOpen, type } = useModalStore();
@@ -33,6 +34,9 @@ export const ModalManager = () => {
 
     case "QUICK_LOG":
       return <QuickLogModal />;
+
+    case "EDIT_LOG":
+      return <EditLogModal />;
 
     default:
       return null;

@@ -29,11 +29,11 @@ export const MainHeading: FC = (): ReactElement => {
     if (id && uuidRegex.test(id)) {
       heading = "Reports";
     }
-  } else if (path.startsWith("/settings/")) {
-    const id = path.split("/settings/")[1];
-    if (id && uuidRegex.test(id)) {
+  } else if (path.startsWith("/settings")) {
+
       heading = "Settings";
-    }
+      subtitle = "Manage your workspace, branding, and app preferences.";
+    
   } else {
     const pathToHeadingMap: Record<string, string> = {
       "/dashboard": "Clients",

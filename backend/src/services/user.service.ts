@@ -20,16 +20,37 @@ export interface UpdateWorkspaceDTO {
 
 @injectable()
 export class UserService {
-  async getByUserId(userId: string) {
+  async getSettingsByUserId(userId: string) {
     try {
-      return await prisma.preference.findUnique({
-        where: { userId },
+      const userSettings = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          avatar: true,
+          provider: true,
+          // Pull in the 1:1 relationships
+          workspace: true,
+          preference: true,
+        },
       });
+
+      if (!userSettings) {
+        throw new AppError({
+          message: "User not found.",
+          statusCode: StatusCodes.NOT_FOUND,
+          code: "USER_NOT_FOUND",
+        });
+      }
+
+      return userSettings;
     } catch (error) {
+      if (error instanceof AppError) throw error;
       throw new AppError({
-        message: "Failed to fetch preferences.",
+        message: "Failed to fetch user settings.",
         statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        code: "PREFERENCE_FETCH_FAILED",
+        code: "USER_SETTINGS_FETCH_FAILED",
         debugMessage: (error as Error).message,
         cause: error as Error,
       });

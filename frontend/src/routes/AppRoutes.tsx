@@ -4,6 +4,7 @@ import { SingleClient } from "@/pages/singleClient/SingleClient";
 import { ClientView } from "@/pages/clientView/ClientView";
 import { Landing } from "@/pages/landing/Landing";
 import { Auth } from "@/pages/auth/Auth";
+import { Settings } from "@/pages/settings/Settings";
 import { ForgotPasswordRequest } from "@/pages/forgotPassword/forgotPasswordRequest/ForgotPasswordRequest";
 import { ResetPassword } from "@/pages/forgotPassword/ResetPassword/ResetPassword";
 import { OAuthCallback } from "@/pages/authCallback/OAuthCallback/OAuthCallback";
@@ -21,6 +22,7 @@ export const AppRoutes = () => {
       <Route element={<PrivateRoutes />}>
         <Route path="/dashboard/:id" element={<Dashboard />} />
         <Route path="/client/:id" element={<SingleClient />} />
+        <Route path="/settings" element={<Settings />} />
       </Route>
       <Route path="/:slug" element={<ClientView />} />
     </Routes>
