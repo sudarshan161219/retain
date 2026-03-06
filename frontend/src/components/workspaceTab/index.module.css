@@ -1,0 +1,135 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 720px;
+  background-color: var(--card);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* SECTION HEADER */
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.sectionDesc {
+  font-size: 13px;
+  color: var(--label);
+}
+
+/* GRID LAYOUTS */
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.grid3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+/* FORM GROUP */
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroup .label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label);
+}
+
+.select > option {
+  background-color: var(--card);
+  cursor: pointer;
+  margin-top: 0.8rem;
+  padding: 0.5rem;
+}
+
+.select {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--border);
+  background-color: color-mix(in oklab, var(--input) 30%, transparent);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: var(--primary);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--topupbtn-accent-text);
+}
+
+/* FULL WIDTH FIELD */
+
+.colSpan3 {
+  grid-column: span 3;
+}
+
+/* DIVIDER */
+
+.divider {
+  border: none;
+  height: 1px;
+  background: var(--border);
+}
+
+/* FOOTER */
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+/* SUBMIT BUTTON */
+
+.submitBtn {
+  min-width: 160px;
+  cursor: pointer;
+}
+
+/* MOBILE RESPONSIVE */
+
+@media (max-width: 768px) {
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid3 {
+    grid-template-columns: 1fr;
+  }
+
+  .colSpan3 {
+    grid-column: span 1;
+  }
+
+  .footer {
+    justify-content: stretch;
+  }
+
+  .submitBtn {
+    width: 100%;
+  }
+}

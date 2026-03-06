@@ -1,15 +1,12 @@
-import { useState } from "react";
 import { Building2, Settings2, Loader2, User } from "lucide-react";
 import { useSettings } from "@/hooks/user/useSettings";
 import { WorkspaceTab } from "@/components/workspaceTab/WorkspaceTab";
 import { PreferenceTab } from "@/components/preferenceTab/PreferenceTab";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import styles from "./index.module.css";
-
-type Tab = "workspace" | "preferences" | "account";
 
 export const Settings = () => {
   const { settings, isLoading } = useSettings();
-  const [activeTab, setActiveTab] = useState<Tab>("workspace");
 
   if (isLoading) {
     return (
@@ -21,42 +18,26 @@ export const Settings = () => {
 
   return (
     <div className={styles.container}>
-
-
       <div className={styles.layout}>
-        {/* SIDEBAR NAVIGATION */}
-        <nav className={styles.sidebar}>
-          <button
-            onClick={() => setActiveTab("workspace")}
-            className={`${styles.navButton} ${activeTab === "workspace" ? styles.navButtonActive : styles.navButtonInactive}`}
-          >
-            <Building2 size={16} /> Workspace
-          </button>
-
-          <button
-            onClick={() => setActiveTab("preferences")}
-            className={`${styles.navButton} ${activeTab === "preferences" ? styles.navButtonActive : styles.navButtonInactive}`}
-          >
-            <Settings2 size={16} /> Preferences
-          </button>
-
-          <button
-            onClick={() => setActiveTab("account")}
-            className={`${styles.navButton} ${activeTab === "account" ? styles.navButtonActive : styles.navButtonInactive}`}
-          >
-            <User size={16} /> Account
-          </button>
-        </nav>
-
-        {/* TAB CONTENT AREA */}
-        <div className={styles.contentArea}>
-          {activeTab === "workspace" && (
+        <Tabs defaultValue="workspace">
+          <TabsList variant="line">
+            <TabsTrigger value="workspace" className="cursor-pointer">
+              <Building2 /> Workspace
+            </TabsTrigger>
+            <TabsTrigger value="preferences" className="cursor-pointer">
+              <Settings2 /> Preferences
+            </TabsTrigger>
+            <TabsTrigger value="account" className="cursor-pointer">
+              <User /> Account
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="workspace">
             <WorkspaceTab data={settings?.workspace} />
-          )}
-          {activeTab === "preferences" && (
+          </TabsContent>
+          <TabsContent value="preferences">
             <PreferenceTab data={settings?.preference} />
-          )}
-          {activeTab === "account" && (
+          </TabsContent>
+          <TabsContent value="account">
             <div
               style={{
                 padding: "1.5rem",
@@ -66,8 +47,8 @@ export const Settings = () => {
             >
               Account settings coming soon.
             </div>
-          )}
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

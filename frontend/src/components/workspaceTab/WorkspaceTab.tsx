@@ -34,7 +34,9 @@ export const WorkspaceTab = ({ data }: { data: any }) => {
     e.preventDefault();
     updateWorkspace.mutate({
       ...formData,
-      defaultHourlyRate: formData.defaultHourlyRate ? Number(formData.defaultHourlyRate) : undefined,
+      defaultHourlyRate: formData.defaultHourlyRate
+        ? Number(formData.defaultHourlyRate)
+        : undefined,
     });
   };
 
@@ -42,32 +44,49 @@ export const WorkspaceTab = ({ data }: { data: any }) => {
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Workspace Details</h2>
-        <p className={styles.sectionDesc}>This information appears on your client-facing portals.</p>
+        <p className={styles.sectionDesc}>
+          This information appears on your client-facing portals.
+        </p>
       </div>
 
       <div className={styles.grid2}>
         <div className={styles.formGroup}>
-          <Label>Business / Agency Name</Label>
-          <Input 
-            value={formData.businessName} 
-            onChange={e => setFormData({...formData, businessName: e.target.value})} 
-            placeholder="e.g. NodeDev Studio" 
+          <Label htmlFor="name" className={styles.label}>
+            Business / Agency Name
+          </Label>
+          <Input
+            id="name"
+            value={formData.businessName}
+            onChange={(e) =>
+              setFormData({ ...formData, businessName: e.target.value })
+            }
+            placeholder="e.g. NodeDev Studio"
           />
         </div>
         <div className={styles.formGroup}>
-          <Label>Logo URL</Label>
-          <Input 
-            value={formData.logoUrl} 
-            onChange={e => setFormData({...formData, logoUrl: e.target.value})} 
-            placeholder="https://..." 
+          <Label htmlFor="logo" className={styles.label}>
+            Logo URL
+          </Label>
+          <Input
+            id="logo"
+            value={formData.logoUrl}
+            onChange={(e) =>
+              setFormData({ ...formData, logoUrl: e.target.value })
+            }
+            placeholder="https://..."
           />
         </div>
         <div className={styles.formGroup}>
-          <Label>Tax ID / VAT</Label>
-          <Input 
-            value={formData.taxId} 
-            onChange={e => setFormData({...formData, taxId: e.target.value})} 
-            placeholder="Optional" 
+          <Label htmlFor="taxId" className={styles.label}>
+            Tax ID / VAT
+          </Label>
+          <Input
+            id="taxId"
+            value={formData.taxId}
+            onChange={(e) =>
+              setFormData({ ...formData, taxId: e.target.value })
+            }
+            placeholder="Optional"
           />
         </div>
       </div>
@@ -76,39 +95,71 @@ export const WorkspaceTab = ({ data }: { data: any }) => {
 
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Retainer Defaults</h2>
-        <p className={styles.sectionDesc}>Pre-fills when creating a new client.</p>
+        <p className={styles.sectionDesc}>
+          Pre-fills when creating a new client.
+        </p>
       </div>
 
       <div className={styles.grid3}>
         <div className={styles.formGroup}>
-          <Label>Default Hourly Rate</Label>
-          <Input 
-            type="number" 
-            value={formData.defaultHourlyRate} 
-            onChange={e => setFormData({...formData, defaultHourlyRate: e.target.value})} 
+          <Label htmlFor="hrRate" className={styles.label}>
+            Default Hourly Rate
+          </Label>
+          <Input
+            id="hrRate"
+            type="number"
+            value={formData.defaultHourlyRate}
+            placeholder="20"
+            onChange={(e) =>
+              setFormData({ ...formData, defaultHourlyRate: e.target.value })
+            }
           />
         </div>
         <div className={styles.formGroup}>
-          <Label>Currency</Label>
-          <Input 
-            value={formData.defaultCurrency} 
-            onChange={e => setFormData({...formData, defaultCurrency: e.target.value.toUpperCase()})} 
-            maxLength={3}
-          />
+          <Label htmlFor="currency" className={styles.label}>
+            Currency
+          </Label>
+          <select
+            id="currency"
+            className={styles.select}
+            value={formData.defaultCurrency}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                defaultCurrency: e.target.value.toUpperCase(),
+              })
+            }
+          >
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="INR">INR (₹)</option>
+          </select>
         </div>
         <div className={`${styles.formGroup} ${styles.colSpan3}`}>
-          <Label>Default Refill Link (Stripe/PayPal)</Label>
-          <Input 
-            value={formData.defaultRefillLink} 
-            onChange={e => setFormData({...formData, defaultRefillLink: e.target.value})} 
-            placeholder="https://buy.stripe.com/..." 
+          <Label htmlFor="refillink" className={styles.label}>
+            Default Refill Link (Stripe/PayPal)
+          </Label>
+          <Input
+            id="refillink"
+            value={formData.defaultRefillLink}
+            onChange={(e) =>
+              setFormData({ ...formData, defaultRefillLink: e.target.value })
+            }
+            placeholder="https://buy.stripe.com/..."
           />
         </div>
       </div>
 
       <div className={styles.footer}>
-        <Button type="submit" disabled={updateWorkspace.isPending} className={styles.submitBtn}>
-          {updateWorkspace.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button
+          type="submit"
+          disabled={updateWorkspace.isPending}
+          className={styles.submitBtn}
+        >
+          {updateWorkspace.isPending && (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          )}
           Save Workspace
         </Button>
       </div>
