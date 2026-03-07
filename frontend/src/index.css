@@ -132,10 +132,16 @@
 
 /* --- GLOBAL SCROLLBAR STYLING --- */
 
-/* 1. Firefox Support */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 * {
-  scrollbar-width: thin; /* Options: auto, thin, none */
-  scrollbar-color: #3f3f46 transparent; /* Thumb Color | Track Color */
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+  margin: 0;
 }
 
 /* 2. Webkit Support (Chrome, Edge, Safari) */
@@ -183,4 +189,41 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
   transition: background-color 9999s ease-in-out 0s;
   -webkit-text-fill-color: var(--primary) !important;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+}
+
+/* Remove list styles */
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+}
+
+/* Images */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Form elements inherit font */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Remove link underline */
+a {
+  text-decoration: none;
+  color: inherit;
 }

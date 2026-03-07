@@ -1,7 +1,13 @@
+
 export interface User {
   id: string;
-  name: string;
   email: string;
-  createdAt?: string;
-  avatar: string;
+  name: string | null;
+  avatar: string | null;
+  provider: "local" | "google" | "github";
+  googleId?: string | null;
+  githubId?: string | null;
+  defaultRefillLink?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }

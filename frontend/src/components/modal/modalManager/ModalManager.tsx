@@ -7,6 +7,7 @@ import { EditClientModal } from "../editClientModal/EditClientModal";
 import { SearchFilterModal } from "../searchFilterModal/SearchFilterModal";
 import { QuickLogModal } from "../quickLogModal/QuickLogModal";
 import { EditLogModal } from "../editLogModal/EditLogModal";
+import { PreferenceModal } from "../preferenceModal/PreferenceModal";
 
 export const ModalManager = () => {
   const { isOpen, type } = useModalStore();
@@ -37,6 +38,9 @@ export const ModalManager = () => {
 
     case "EDIT_LOG":
       return <EditLogModal />;
+
+    case "PREFERENCES":
+      return <PreferenceModal />;
 
     default:
       return null;

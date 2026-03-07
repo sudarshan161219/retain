@@ -3,10 +3,12 @@ import { LogOut, User as UserIcon, Settings, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/hooks/user/useUser";
 import styles from "./index.module.css";
+import { useModalStore } from "@/store/modalStore/useModalStore";
 
 export const UserMenu = () => {
   const navigate = useNavigate();
   const { data: user, isLoading: isUserLoading } = useUser();
+  const { isOpen: open, openModal } = useModalStore();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +29,7 @@ export const UserMenu = () => {
 
   if (!user) return null;
 
-  // Get Initials (e.g. "Sudarshan Hosalli" -> "SH")
+  // Get Initials
   const initials = user.name
     ? user.name
         .split(" ")
@@ -87,7 +89,7 @@ export const UserMenu = () => {
             </button>
 
             <button
-              onClick={() => navigate("/settings/billing")}
+              onClick={() => openModal("PREFERENCES")}
               className={styles.button}
             >
               <Settings size={16} />

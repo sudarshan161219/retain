@@ -1,7 +1,8 @@
-import { Building2, Settings2, Loader2, User } from "lucide-react";
+import { Building2, Loader2, User } from "lucide-react";
 import { useSettings } from "@/hooks/user/useSettings";
-import { WorkspaceTab } from "@/components/workspaceTab/WorkspaceTab";
-import { PreferenceTab } from "@/components/preferenceTab/PreferenceTab";
+import { AccountSettings } from "@/components/settingsTabs/accountSettingsTab/AccountSettings";
+import { WorkspaceTab } from "@/components/settingsTabs/workspaceTab/WorkspaceTab";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import styles from "./index.module.css";
 
@@ -24,9 +25,6 @@ export const Settings = () => {
             <TabsTrigger value="workspace" className="cursor-pointer">
               <Building2 /> Workspace
             </TabsTrigger>
-            <TabsTrigger value="preferences" className="cursor-pointer">
-              <Settings2 /> Preferences
-            </TabsTrigger>
             <TabsTrigger value="account" className="cursor-pointer">
               <User /> Account
             </TabsTrigger>
@@ -34,19 +32,9 @@ export const Settings = () => {
           <TabsContent value="workspace">
             <WorkspaceTab data={settings?.workspace} />
           </TabsContent>
-          <TabsContent value="preferences">
-            <PreferenceTab data={settings?.preference} />
-          </TabsContent>
+
           <TabsContent value="account">
-            <div
-              style={{
-                padding: "1.5rem",
-                fontSize: "0.875rem",
-                color: "#6b7280",
-              }}
-            >
-              Account settings coming soon.
-            </div>
+            <AccountSettings />
           </TabsContent>
         </Tabs>
       </div>

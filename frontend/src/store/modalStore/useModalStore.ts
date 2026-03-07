@@ -13,6 +13,7 @@ export type ModalType =
   | "DELETE_CLIENT"
   | "EDIT_LOG"
   | "DELETE_LOG"
+  | "PREFERENCES"
   | null;
 
 interface ModalData {

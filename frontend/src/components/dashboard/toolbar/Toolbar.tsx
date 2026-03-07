@@ -122,7 +122,6 @@ export const Toolbar = () => {
         >
           <Plus size={18} className=" hidden sm:block" />
           <span className="hidden sm:inline">New Client</span>
-          <Plus size={18} className="sm:hidden" />
         </Button>
       </div>
     </div>
