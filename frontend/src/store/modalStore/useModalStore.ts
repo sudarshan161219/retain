@@ -14,6 +14,7 @@ export type ModalType =
   | "EDIT_LOG"
   | "DELETE_LOG"
   | "PREFERENCES"
+  | "AVATAR_UPLOAD"
   | null;
 
 interface ModalData {

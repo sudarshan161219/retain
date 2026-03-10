@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import styles from "./index.module.css";
+import { useModalStore } from "@/store/modalStore/useModalStore";
 
 export const AccountSettings = () => {
+  const { openModal } = useModalStore();
   const { data: initialUser, isLoading: isUserLoading } = useUser();
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -74,6 +76,7 @@ export const AccountSettings = () => {
                 type="button"
                 variant="outline"
                 size="sm"
+                onClick={() => openModal("AVATAR_UPLOAD")}
               >
                 Change Avatar
               </Button>

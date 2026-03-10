@@ -8,6 +8,7 @@ import { SearchFilterModal } from "../searchFilterModal/SearchFilterModal";
 import { QuickLogModal } from "../quickLogModal/QuickLogModal";
 import { EditLogModal } from "../editLogModal/EditLogModal";
 import { PreferenceModal } from "../preferenceModal/PreferenceModal";
+import { AvatarUploadModal } from "../avatarUploadModal/AvatarUploadModal";
 
 export const ModalManager = () => {
   const { isOpen, type } = useModalStore();
@@ -41,6 +42,9 @@ export const ModalManager = () => {
 
     case "PREFERENCES":
       return <PreferenceModal />;
+
+    case "AVATAR_UPLOAD":
+      return <AvatarUploadModal />;
 
     default:
       return null;
