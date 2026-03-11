@@ -10,6 +10,7 @@ import { useAvatarStore } from "@/store/avatarStore/useAvatarStore";
 import { useModalStore } from "@/store/modalStore/useModalStore";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { EditAvatarModal } from "@/components/modal/editAvatarModal/EditAvatarModal";
 import styles from "./index.module.css";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -49,7 +50,6 @@ export const AvatarUploadModal = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       processFile(e.target.files[0]);
-      console.log(file, previewUrl);
     }
   };
 
@@ -150,29 +150,7 @@ export const AvatarUploadModal = () => {
             </div>
           ) : (
             /* PREVIEW STATE */
-            <div className={styles.previewContainer}>
-              <div className={styles.avatarPreview}>
-                <img
-                  src={previewUrl}
-                  alt="Avatar preview"
-                  className={styles.avatarImage}
-                />
-              </div>
-              <p className={styles.fileName}>{file?.name}</p>
-
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={() => {
-                  clearFile();
-                  if (fileInputRef.current) fileInputRef.current.value = "";
-                }}
-                disabled={isUploading}
-              >
-                <Trash2 size={16} className="mr-2" /> Remove
-              </Button>
-            </div>
+            <EditAvatarModal />
           )}
 
           {/* Hidden file input */}
@@ -192,6 +170,7 @@ export const AvatarUploadModal = () => {
             variant="outline"
             onClick={handleClose}
             disabled={isUploading}
+            className="cursor-pointer"
           >
             Cancel
           </Button>
@@ -199,7 +178,7 @@ export const AvatarUploadModal = () => {
             type="button"
             onClick={handleUpload}
             disabled={!file || isUploading}
-            className="bg-black hover:bg-gray-800 text-white"
+            className="cursor-pointer"
           >
             {isUploading ? (
               <Loader2 className="animate-spin mr-2" size={16} />

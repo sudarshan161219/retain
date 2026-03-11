@@ -30,6 +30,7 @@ export const useAvatarStore = create<AvatarStore>((set, get) => ({
 
     // 2. Create the new preview URL and save the file
     const objectUrl = URL.createObjectURL(file);
+    console.log(objectUrl);
     set({ file, previewUrl: objectUrl });
   },
 
