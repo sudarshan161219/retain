@@ -17,9 +17,26 @@
 }
 
 .controls {
+  padding: 1rem;
+  border-radius: 5px;
   width: 100%;
+  display: flex;
+  gap: 10px;
+  background-color: var(--muted);
+  border: 1px solid var(--border);
 }
 
 .slider {
   padding: 22px 0px;
+  cursor: pointer;
+}
+
+.zoomBtns {
+  display: flex;
+  cursor: pointer;
+  color: var(--label);
+}
+
+.zoomBtns:hover {
+  color: var(--primary);
 }

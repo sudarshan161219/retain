@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { X, Loader2, Image as ImageIcon } from "lucide-react";
 import Cropper from "react-easy-crop";
+import { ZoomIn, ZoomOut } from "lucide-react";
 import type { Point, Area } from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
 import { Slider } from "@/components/ui/slider";
@@ -16,27 +16,20 @@ export const EditAvatarModal = () => {
     console.log(croppedArea, croppedAreaPixels);
   };
 
-  const handleZoom = (i: number) => {
-    setZoom(Number(i));
-    console.log(i);
+  const handleZoom = (i: number[]) => {
+    setZoom(i[0]);
+  };
+
+  const handleZoomIn = () => {
+    setZoom((prev) => Math.min(10, prev + 0.5)); // Jumps by 0.5 on click
+  };
+
+  const handleZoomOut = () => {
+    setZoom((prev) => Math.max(1, prev - 0.5));
   };
 
   return (
     <div className={styles.app}>
-      {/* HEADER */}
-      {/* <div className={styles.header}>
-          <div>
-            <h2 className={styles.title}>Upload Avatar</h2>
-            <p className={styles.subtitle}>
-              Choose a profile picture for your workspace.
-            </p>
-          </div>
-          <button className={styles.closeBtn}>
-            <X size={20} />
-          </button>
-        </div> */}
-
-      {/* BODY */}
       <div className={styles.cropcontainer}>
         <Cropper
           disableAutomaticStylesInjection={true}
@@ -52,35 +45,30 @@ export const EditAvatarModal = () => {
           image={previewUrl || ""}
           crop={crop}
           zoom={zoom}
-          aspect={4 / 3}
+          aspect={5 / 5}
           onCropChange={setCrop}
           onCropComplete={onCropComplete}
           onZoomChange={setZoom}
         />
       </div>
       <div className={styles.controls}>
+        <button onClick={handleZoomOut} className={styles.zoomBtns}>
+          <ZoomOut size={19} />
+        </button>
         <Slider
+          className="cursor-pointer "
           defaultValue={[zoom]}
+          value={[zoom]}
           min={1}
-          max={3}
+          max={10}
           step={0.1}
           aria-labelledby="Zoom"
-          onValueCommit={(zoom) => handleZoom(Number(zoom))}
+          onValueChange={handleZoom}
         />
+        <button onClick={handleZoomIn} className={styles.zoomBtns}>
+          <ZoomIn size={19} />
+        </button>
       </div>
-
-      {/* FOOTER */}
-      {/* <div className={styles.footer}>
-          <Button type="button" variant="outline">
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            className="bg-black hover:bg-gray-800 text-white"
-          >
-            Save
-          </Button>
-        </div> */}
     </div>
   );
 };

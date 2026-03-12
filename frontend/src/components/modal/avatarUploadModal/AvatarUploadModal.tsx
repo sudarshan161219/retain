@@ -5,6 +5,7 @@ import {
   Loader2,
   Image as ImageIcon,
   Trash2,
+  ArrowLeft,
 } from "lucide-react";
 import { useAvatarStore } from "@/store/avatarStore/useAvatarStore";
 import { useModalStore } from "@/store/modalStore/useModalStore";
@@ -14,10 +15,12 @@ import { EditAvatarModal } from "@/components/modal/editAvatarModal/EditAvatarMo
 import styles from "./index.module.css";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+type ModalStep = "UPLOAD" | "CROP";
 
 export const AvatarUploadModal = () => {
   const { isOpen, type, closeModal } = useModalStore();
   const { file, previewUrl, handleFileSelect, clearFile } = useAvatarStore();
+  const [currentStep, setCurrentStep] = useState<ModalStep>("UPLOAD");
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -28,6 +31,7 @@ export const AvatarUploadModal = () => {
     closeModal();
     setTimeout(() => {
       clearFile();
+      setCurrentStep("UPLOAD");
       if (fileInputRef.current) fileInputRef.current.value = "";
     }, 200);
   };
@@ -45,6 +49,7 @@ export const AvatarUploadModal = () => {
     }
 
     handleFileSelect(selectedFile);
+    setCurrentStep("CROP");
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,10 +113,14 @@ export const AvatarUploadModal = () => {
         {/* HEADER */}
         <div className={styles.header}>
           <div>
-            <h2 className={styles.title}>Upload Avatar</h2>
-            <p className={styles.subtitle}>
-              Choose a profile picture for your workspace.
-            </p>
+            <h2 className={styles.title}>
+              {currentStep === "CROP" ? "Edit Avatar" : "Upload Avatar"}
+            </h2>
+            {currentStep === "UPLOAD" && (
+              <p className={styles.subtitle}>
+                Choose a profile picture for your workspace.
+              </p>
+            )}
           </div>
           <button
             onClick={handleClose}
@@ -124,29 +133,65 @@ export const AvatarUploadModal = () => {
 
         {/* BODY */}
         <div className={styles.body}>
-          {!previewUrl ? (
+          {currentStep === "UPLOAD" ? (
             /* DROPZONE STATE */
-            <div
-              className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ""}`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <div className={styles.dropzoneContent}>
-                <div className={styles.iconWrapper}>
-                  <UploadCloud size={32} />
+
+            <div className="flex flex-col gap-4">
+              {previewUrl ? (
+                <div className={styles.previewContainer}>
+                  <div className={styles.avatarPreview}>
+                    <img
+                      src={previewUrl}
+                      alt="Avatar preview"
+                      className={styles.avatarImage}
+                    />
+                  </div>
+
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="cursor-pointer"
+                    onClick={() => {
+                      clearFile();
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                    disabled={isUploading}
+                  >
+                    <Trash2 size={11} className="mr-2" /> Remove
+                  </Button>
                 </div>
-                <p className={styles.dropzoneText}>
-                  <span className={styles.dropzoneHighlight}>
-                    Click to upload
-                  </span>{" "}
-                  or drag and drop
-                </p>
-                <p className={styles.dropzoneSubtext}>
-                  SVG, PNG, JPG or WebP (max. 5MB)
-                </p>
-              </div>
+              ) : (
+                <div
+                  className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ""}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <div className={styles.dropzoneContent}>
+                    <div className={styles.iconWrapper}>
+                      <UploadCloud size={32} />
+                    </div>
+                    <p className={styles.dropzoneText}>
+                      <span className={styles.dropzoneHighlight}>
+                        Click to upload
+                      </span>{" "}
+                      or drag and drop
+                    </p>
+                    <p className={styles.dropzoneSubtext}>
+                      SVG, PNG, JPG or WebP (max. 5MB)
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* If they went back but still have a file, show them what is selected */}
+              {file && (
+                <div className="text-sm text-center text-label">
+                  Current selection:{" "}
+                  <span className={styles.fileName}>{file.name}</span>
+                </div>
+              )}
             </div>
           ) : (
             /* PREVIEW STATE */
@@ -165,28 +210,60 @@ export const AvatarUploadModal = () => {
 
         {/* FOOTER */}
         <div className={styles.footer}>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            disabled={isUploading}
-            className="cursor-pointer"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            onClick={handleUpload}
-            disabled={!file || isUploading}
-            className="cursor-pointer"
-          >
-            {isUploading ? (
-              <Loader2 className="animate-spin mr-2" size={16} />
-            ) : (
-              <ImageIcon className="mr-2" size={16} />
-            )}
-            {isUploading ? "Uploading..." : "Save Avatar"}
-          </Button>
+          {currentStep === "CROP" ? (
+            <div className="flex gap-2 w-full justify-between">
+              {/* BACK BUTTON */}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setCurrentStep("UPLOAD")}
+                className="cursor-pointer"
+              >
+                <ArrowLeft size={16} className="mr-2" /> Back
+              </Button>
+              <Button type="button" className="cursor-pointer">
+                Apply Crop
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2 w-full justify-end">
+              {/* <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={isUploading}
+                className="cursor-pointer"
+              >
+                Cancel
+              </Button> */}
+
+              {/* Optional: Let them jump back to the crop view if a file exists */}
+              {file && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="cursor-pointer"
+                  onClick={() => setCurrentStep("CROP")}
+                >
+                  Edit Selection
+                </Button>
+              )}
+
+              <Button
+                type="button"
+                onClick={handleUpload}
+                disabled={!file || isUploading}
+                className="cursor-pointer"
+              >
+                {isUploading ? (
+                  <Loader2 className="animate-spin mr-2" size={16} />
+                ) : (
+                  <ImageIcon className="mr-2" size={16} />
+                )}
+                {isUploading ? "Uploading..." : "Save Avatar"}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
